@@ -22,29 +22,37 @@ Dialog DLL:      TARMCM1.DLL V1.14.0.0
  
 <h2>Project:</h2>
 C:\Users\Forrest DeVita\Documents\School Stuff\Senior\Fall 2018\ECE 485\Better Game Of Tag\Firmware\Better Game Of Tag.uvprojx
-Project File Date:  06/25/2018
+Project File Date:  06/26/2018
 
 <h2>Output:</h2>
 *** Using Compiler 'V5.06 update 6 (build 750)', folder: 'C:\Keil_v5\ARM\ARMCC\Bin'
 Rebuild target 'Target 1'
-compiling DAC.c...
 compiling DMA.c...
 compiling main.c...
+compiling DAC.c...
 compiling packets.c...
 compiling queue.c...
 compiling threads.c...
 compiling UART.c...
-Source\UART.c(27): warning:  #550-D: variable "temp"  was set but never used
+Source\UART.c(32): warning:  #550-D: variable "temp"  was set but never used
   	uint8_t temp;
-Source\UART.c: 1 warning, 0 errors
-compiling rtx_lib.c...
-compiling RTX_Config.c...
-assembling startup_MKL25Z4.s...
+Source\UART.c(118): warning:  #550-D: variable "dummy_read"  was set but never used
+  	uint8_t dummy_read;
+Source\UART.c: 2 warnings, 0 errors
+compiling utilities.c...
+compiling crc.c...
 compiling timers.c...
+compiling rtx_lib.c...
+compiling BLE.c...
+Source\BLE.c(8): warning:  #177-D: variable "sBLE"  was declared but never referenced
+  } sBLE;
+Source\BLE.c: 1 warning, 0 errors
+assembling startup_MKL25Z4.s...
+compiling RTX_Config.c...
 compiling system_MKL25Z4.c...
 linking...
-Program Size: Code=11964 RO-data=4948 RW-data=9948 ZI-data=892  
-".\Objects\Better Game Of Tag.axf" - 0 Error(s), 1 Warning(s).
+Program Size: Code=11716 RO-data=4948 RW-data=9936 ZI-data=376  
+".\Objects\Better Game Of Tag.axf" - 0 Error(s), 3 Warning(s).
 
 <h2>Software Packages used:</h2>
 
@@ -79,24 +87,24 @@ Package Vendor: Keil
    * Component: ARM::CMSIS:CORE:5.1.1
 
    * Component: ARM::CMSIS:RTOS2:Keil RTX5:Library:5.3.0
-      Library file:  CMSIS\RTOS2\RTX\Library\ARM\RTX_CM0.lib
+      Source file:   CMSIS\RTOS2\RTX\Template\Thread.c
       Source file:   CMSIS\RTOS2\RTX\Template\svc_user.c
-      Source file:   CMSIS\RTOS2\RTX\Source\rtx_lib.c
-      Source file:   CMSIS\RTOS2\RTX\Template\Timer.c
-      Source file:   CMSIS\RTOS2\RTX\Template\Mutex.c
       Source file:   CMSIS\RTOS2\RTX\Template\Semaphore.c
+      Source file:   CMSIS\RTOS2\RTX\Template\MsgQueue.c
+      Library file:  CMSIS\RTOS2\RTX\Library\ARM\RTX_CM0.lib
+      Source file:   CMSIS\RTOS2\RTX\Template\Timer.c
+      Source file:   CMSIS\RTOS2\RTX\Source\rtx_lib.c
+      Source file:   CMSIS\RTOS2\RTX\Template\Mutex.c
+      Include file:  CMSIS\RTOS2\RTX\Include\rtx_os.h
       Source file:   CMSIS\RTOS2\RTX\Config\RTX_Config.c
       Source file:   CMSIS\RTOS2\RTX\Template\main.c
-      Source file:   CMSIS\RTOS2\RTX\Template\Events.c
-      Include file:  CMSIS\RTOS2\RTX\Include\rtx_os.h
       Include file:  CMSIS\RTOS2\RTX\Config\RTX_Config.h
+      Source file:   CMSIS\RTOS2\RTX\Template\Events.c
       Source file:   CMSIS\RTOS2\RTX\Template\MemPool.c
-      Source file:   CMSIS\RTOS2\RTX\Template\MsgQueue.c
-      Source file:   CMSIS\RTOS2\RTX\Template\Thread.c
 
    * Component: Keil::Device:Startup:2.5.0
-      Source file:   Device\Source\ARM\startup_MKL25Z4.s
       Include file:  Device\Source\system_MKL25Z4.h
+      Source file:   Device\Source\ARM\startup_MKL25Z4.s
       Source file:   Device\Source\system_MKL25Z4.c
 Build Time Elapsed:  00:00:05
 </pre>

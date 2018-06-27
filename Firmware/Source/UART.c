@@ -1,8 +1,6 @@
 #include "UART.h"
 #include <stdio.h>
-
-Q_T TxQ, RxQ;
-volatile uint8_t message_recieved=0;
+#include "utilities.h"
 
 /* BEGIN - UART0 Device Driver
 
@@ -13,26 +11,33 @@ volatile uint8_t message_recieved=0;
 
 	Modified by Alex Dean 9/13/2016
 */
-struct __FILE
+
+static struct
 {
-  int handle;
-};
+  ISRCallback callback;
+  uint8_t *pRxBuffer; //will be passed in by calling module
+  uint8_t rxBufferLength;
+  uint32_t numBytesReceived;
+} sUART;
 
-FILE __stdout;  //Use with printf
-FILE __stdin;		//use with fget/sscanf, or scanf
-
-// Code listing 8.8, p. 231
-void Init_UART0(uint32_t baud_rate) {
+extern void UART0_init(uint32_t baud_rate, ISRCallback callback)
+{
+  sUART.callback = callback;
+  sUART.pRxBuffer = NULL;
+  sUART.rxBufferLength = 0;
+  sUART.numBytesReceived = 0;
+  
+  //the rest of the init goes here
 	uint16_t sbr;
 	uint8_t temp;
-	
+
 	// Enable clock gating for UART0 and Port A
 	SIM->SCGC4 |= SIM_SCGC4_UART0_MASK; 										
 	SIM->SCGC5 |= SIM_SCGC5_PORTA_MASK;											
-	
+
 	// Make sure transmitter and receiver are disabled before init
 	UART0->C2 &= ~UART0_C2_TE_MASK & ~UART0_C2_RE_MASK; 		
-	
+
 	// Set UART clock to 48 MHz clock 
 	SIM->SOPT2 |= SIM_SOPT2_UART0SRC(1);
 	SIM->SOPT2 |= SIM_SOPT2_PLLFLLSEL_MASK;
@@ -41,7 +46,7 @@ void Init_UART0(uint32_t baud_rate) {
 	//PTA1 is Rx and PTA2 is Tx
 	PORTA->PCR[1] = PORT_PCR_ISF_MASK | PORT_PCR_MUX(2); // Rx
 	PORTA->PCR[2] = PORT_PCR_ISF_MASK | PORT_PCR_MUX(2); // Tx
-	
+
 	// Set baud rate and oversampling ratio
 	sbr = (uint16_t)((SYS_CLOCK)/(baud_rate * UART_OVERSAMPLE_RATE)); 			
 	UART0->BDH &= ~UART0_BDH_SBR_MASK;
@@ -51,7 +56,7 @@ void Init_UART0(uint32_t baud_rate) {
 
 	// Disable interrupts for RX active edge and LIN break detect, select one stop bit
 	UART0->BDH |= UART0_BDH_RXEDGIE(0) | UART0_BDH_SBNS(0) | UART0_BDH_LBKDIE(0);
-	
+
 	// Don't enable loopback mode, use 8 data bit mode, don't use parity
 	UART0->C1 = UART0_C1_LOOPS(0) | UART0_C1_M(0) | UART0_C1_PE(0); 
 	// Don't invert transmit data, don't enable interrupts for errors
@@ -64,13 +69,13 @@ void Init_UART0(uint32_t baud_rate) {
 	// Try it a different way
 	UART0->S1 |= UART0_S1_OR_MASK | UART0_S1_NF_MASK | 
 									UART0_S1_FE_MASK | UART0_S1_PF_MASK;
-	
+
 	// Send LSB first, do not invert received data
 	UART0->S2 = UART0_S2_MSBF(0) | UART0_S2_RXINV(0); 
-	
+
 	// Enable interrupts. Listing 8.11 on p. 234
-	Q_Init(&TxQ);
-	Q_Init(&RxQ);
+	//Q_Init(&TxQ);
+	//Q_Init(&RxQ);
 
 	NVIC_SetPriority(UART0_IRQn, 2); // 0, 1, 2, or 3
 	NVIC_ClearPendingIRQ(UART0_IRQn); 
@@ -81,74 +86,74 @@ void Init_UART0(uint32_t baud_rate) {
 
 	// Enable UART receiver and transmitter
 	UART0->C2 |= UART0_C2_RE(1) | UART0_C2_TE(1);	
-	
+
 	// Clear the UART RDRF flag
 	temp = UART0->D;
 	UART0->S1 &= ~UART0_S1_RDRF_MASK;
-
 }
 
-/* END - UART0 Device Driver 
-	Code created by Shannon Strutz
-	Date : 5/7/2014
-	Licensed under CC BY-NC-SA 3.0
-	http://creativecommons.org/licenses/by-nc-sa/3.0/
+extern void UART_send(uint8_t *pData, uint32_t length)
+{
+  UART0->C2 |= UART_C2_TE(1); //enables UART transmitter
+  for(uint32_t i=0;i<length-1;i++)
+  {
+    while(!(UART0->S1 & UART0_S1_TDRE_MASK));
+    UART0->D = pData[i];
+  }
+}
 
-	Modified by Alex Dean 9/13/2016
-*/
+
+extern void UART_receive(uint8_t *pDest, uint32_t length) //length will probably be the max length of our buffer
+{
+  sUART.pRxBuffer = pDest;
+  sUART.rxBufferLength = length;
+
+  UART0->C2 |= UART_C2_RE(1); //enables UART Receiver
+}
 
 
-// UART0 IRQ Handler. Listing 8.12 on p. 235
-void UART0_IRQHandler(void) {
-	uint8_t ch;
+
+void UART0_isr(void)
+{
+	uint8_t dummy_read;
+  uint32_t status_reg = UART0->S1;
 	
-	if (UART0->S1 & (UART_S1_OR_MASK |UART_S1_NF_MASK | 
-		UART_S1_FE_MASK | UART_S1_PF_MASK)) {
-			// clear the error flags
-			UART0->S1 |= UART0_S1_OR_MASK | UART0_S1_NF_MASK | 
-									UART0_S1_FE_MASK | UART0_S1_PF_MASK;	
-			// read the data register to clear RDRF
-			ch = UART0->D;
-	}
-	if (UART0->S1 & UART0_S1_RDRF_MASK) {
-		// received a character
-		ch = UART0->D;
-		if (!Q_Full(&RxQ)) {
-			Q_Enqueue(&RxQ, ch);
-			if(ch == '\r'){ //every message from BLE ends with a carriage return
-				message_recieved=1;
-			}
-		} else {
-			// error - queue full.
-			// discard character
-		}
-	}
-	if ( (UART0->C2 & UART0_C2_TIE_MASK) && // transmitter interrupt enabled
-			(UART0->S1 & UART0_S1_TDRE_MASK) ) { // tx buffer empty
-		// can send another character
-		if (!Q_Empty(&TxQ)) {
-			UART0->D = Q_Dequeue(&TxQ);
-		} else {
-			// queue is empty so disable transmitter interrupt
-			UART0->C2 &= ~UART0_C2_TIE_MASK;
-		}
-	}
+  if(status_reg & UART0_S1_RDRF_MASK) //if ISR triggered by received character
+  {
+    uint8_t received_val = UART0->D;
+    if(sUART.numBytesReceived < sUART.rxBufferLength && sUART.pRxBuffer) //if we have room to receive, and the Rx buffer exists
+    {
+      sUART.pRxBuffer[sUART.numBytesReceived++] = received_val;
+    }
+    if(sUART.numBytesReceived >= sUART.rxBufferLength || received_val == '\0') //if we are done receiving
+    {
+      //UART_stop_receiving(); //Not needed yet. Will be needed when we are parsing packets.
+	  sUART.pRxBuffer = NULL;
+	  sUART.rxBufferLength = 0;
+	  sUART.numBytesReceived = 0;
+      if(sUART.callback)
+        sUART.callback(IO_RECEIVE); //signal to BLE (or other calling module) that we are done receiving
+    }
+  }
+
+  if(status_reg & (UART_S1_OR_MASK |UART_S1_NF_MASK |  //if some error occured
+		UART_S1_FE_MASK | UART_S1_PF_MASK))
+  {
+	// clear the error flags
+	UART0->S1 |= UART0_S1_OR_MASK | UART0_S1_NF_MASK | 
+				UART0_S1_FE_MASK | UART0_S1_PF_MASK;	
+	// read the data register to clear RDRF
+	dummy_read = UART0->D;
+    if(sUART.callback)
+      sUART.callback(IO_ERROR); //signal to BLE (or other calling module) that we encountered an error
+  }
 }
 
-
-void Send_String(uint8_t * str) {
-	// enqueue string
-	while (*str != '\0') { // copy characters up to null terminator
-		while (Q_Full(&TxQ))
-			; // wait for space to open up
-		Q_Enqueue(&TxQ, *str);
-		str++;
-	}
-	// start transmitter if it isn't already running
-	if (!(UART0->C2 & UART0_C2_TIE_MASK)) {
-		UART0->D = Q_Dequeue(&TxQ); 
-		UART0->C2 |= UART0_C2_TIE(1);
-	}
+void UART_Cancel(void){
+	UART0->C2 &= ~UART_C2_RE(1); //disables UART Receiver
+	UART0->C2 &= ~UART0_C2_TE(1); //disables UART Transmitter
+	Util_fillMemory(sUART.pRxBuffer, sUART.rxBufferLength, '\0'); //clear out Rx buffer
+	//TODO: Also clear our Tx buffer?
 }
 
 

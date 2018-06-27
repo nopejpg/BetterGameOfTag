@@ -7,7 +7,7 @@
 #include "cmsis_os2.h"
 
 #include "threads.h"
-#include "UART.h"
+#include "BLE.h"
 #include "DMA.h"
 #include "DAC.h"
 
@@ -29,7 +29,7 @@ int main (void) {
   EventRecorderInitialize(EventRecordError, 1U);
 #endif
   // ...
-	Init_UART0(9600);
+	BLE_init();
 	Init_DMA_For_Playback();
 	Init_DAC();
 	

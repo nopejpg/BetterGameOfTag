@@ -421,6 +421,21 @@
               <FileType>1</FileType>
               <FilePath>.\Source\timers.c</FilePath>
             </File>
+            <File>
+              <FileName>utilities.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Source\utilities.c</FilePath>
+            </File>
+            <File>
+              <FileName>crc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Source\crc.c</FilePath>
+            </File>
+            <File>
+              <FileName>BLE.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Source\BLE.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
