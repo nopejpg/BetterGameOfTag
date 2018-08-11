@@ -16,18 +16,21 @@ static struct
 {
   ISRCallback callback;
   //uint8_t *pRxBuffer; //will be passed in by calling module
-	char rxCircularBuffer[UART_BUFFER_SIZE];
+	uint8_t rxCircularBuffer[UART_BUFFER_SIZE];
   //uint32_t rxBufferLength;
-  uint32_t numBytesReceived;
+  uint32_t rxIndex;
 	uint32_t startIndex;
 } sUART;
+
+static uint32_t UART_incrementIndex(uint32_t index, uint32_t count);
+static uint32_t UART_decrementIndex(uint32_t index, uint32_t count);
 
 extern void UART0_init(uint32_t baud_rate, ISRCallback callback)
 {
   sUART.callback = callback;
   //sUART.pRxBuffer = NULL;
   //sUART.rxBufferLength = 0;
-  sUART.numBytesReceived = 0;
+  sUART.rxIndex = 0;
   
   //the rest of the init goes here
 	uint16_t sbr;
@@ -88,6 +91,10 @@ extern void UART0_init(uint32_t baud_rate, ISRCallback callback)
 	// Clear the UART RDRF flag
 	temp = UART0->D;
 	UART0->S1 &= ~UART0_S1_RDRF_MASK;
+
+	//Init RX circular buffer
+	Util_fillMemory(sUART.rxCircularBuffer, sizeof(sUART.rxCircularBuffer),'\0');
+  sUART.rxCircularBuffer[UART_BUFFER_SIZE - 1] = '\r';
 }
 
 extern void UART_send(uint8_t *pData, uint32_t length)
@@ -107,7 +114,7 @@ extern void UART_receive(void)
 {
   //sUART.rxBufferLength = length;
 	sUART.startIndex = 0;
-	sUART.numBytesReceived = 0;
+	sUART.rxIndex = 0;
 	Util_fillMemory(sUART.rxCircularBuffer, UART_BUFFER_SIZE, '\0'); //clear out Rx buffer
 
   UART0->C2 |= UART_C2_RE(1); //enables UART Receiver
@@ -123,10 +130,10 @@ void UART0_IRQHandler(void)
   if(status_reg & UART0_S1_RDRF_MASK) //if ISR triggered by received character
   {
     uint8_t received_val = UART0->D;
-    sUART.rxCircularBuffer[sUART.numBytesReceived++] = received_val;
-		if(sUART.numBytesReceived > 255) //handle wrap around
+    sUART.rxCircularBuffer[sUART.rxIndex++] = received_val;
+		if(sUART.rxIndex > 255) //handle wrap around
 		{
-			sUART.numBytesReceived = 0;
+			sUART.rxIndex = 0;
 		}
     if(received_val == '\r') //if we are done receiving
     {
@@ -155,30 +162,81 @@ void UART_Cancel(void){
 	//TODO: Also clear our Tx buffer?
 }
 
-uint8_t UART_getPacket(uint8_t *pBuffer,uint8_t maxLength)
+
+
+uint8_t UART_getPacket(uint8_t *pBuffer)
 {
-	//TODO: look at the emailed copy
 	//the purpose of this function is to take message (string up to \r) and put it into BLE message queue
-	uint32_t currentIndex = sUART.startIndex;
-	uint8_t bytesCopied =0;
-	while((sUART.rxCircularBuffer[currentIndex] != '\r') && (currentIndex<maxLength))
+	bool packetFound=false;
+
+	//Sanity check indexes
+	if(sUART.rxCircularBuffer[UART_decrementIndex(sUART.startIndex,1)] != '\r')
 	{
-		pBuffer[currentIndex++] = sUART.rxCircularBuffer[currentIndex];
-		bytesCopied++;
-		if(currentIndex >= sizeof(sUART.rxCircularBuffer)) //handle wrap-around
+		//Means an overflow occured. Should never get here. If we do, increase buffer size or handle overflow somehow
+		return 0;
+	}
+	
+	uint32_t numBytesInBuffer = (UART_BUFFER_SIZE - sUART.startIndex + sUART.rxIndex)%UART_BUFFER_SIZE;
+	uint32_t packetSize = 0; //declare outside of loop so we know how many bytes are in the packet
+	for(packetSize = 0; packetSize < numBytesInBuffer; packetSize++)
+	{
+		if(sUART.rxCircularBuffer[(sUART.startIndex + packetSize)%UART_BUFFER_SIZE] == '\r')
 		{
-			currentIndex = 0;
+			packetFound = true;
+			break;
 		}
 	}
-	sUART.startIndex = currentIndex+1; //next start index is one after the \r
-	return bytesCopied;
+
+	if(packetFound && (packetSize > 0))
+	{
+		//copy the data (size==i) to pBuffer and bump the startIndex up for the next packet.
+		uint32_t len1 = packetSize;
+		uint32_t len2 = 0;
+
+		if((sUART.startIndex + packetSize) > UART_BUFFER_SIZE)
+		{
+			//if wrap around, we need 2 copies
+			len1 = UART_BUFFER_SIZE - sUART.startIndex;
+			len2 = packetSize - len1;
+		}
+
+		Util_copyMemory(&sUART.rxCircularBuffer[sUART.startIndex], pBuffer, len1);
+		if(len2)
+			Util_copyMemory(&sUART.rxCircularBuffer[0], &pBuffer[len1], len2);
+		
+		sUART.startIndex = UART_incrementIndex(sUART.startIndex, packetSize);
+	}
+	else{
+		packetSize=0;
+	}
+	
+	return packetSize;	
 }
+
+
 
 void UART_resetRxBuffer(void)
 {
 	Util_fillMemory((uint8_t*)sUART.rxCircularBuffer, UART_BUFFER_SIZE, '\0');
 	sUART.startIndex=0;
-	sUART.numBytesReceived=0;
+	sUART.rxIndex=0;
 }
 
-// *******************************ARM University Program Copyright © ARM Ltd 2013*************************************   
+static uint32_t UART_incrementIndex(uint32_t index, uint32_t count)
+{
+  return ((index + count) % UART_BUFFER_SIZE);  
+}
+
+static uint32_t UART_decrementIndex(uint32_t index, uint32_t count)
+{
+  uint32_t retIndex;
+  
+  if(index >= count)
+    retIndex = index - count;
+  else
+    retIndex = UART_BUFFER_SIZE - (count - index + 1);
+  
+  return retIndex;
+}
+
+// *******************************ARM University Program Copyright ï¿½ ARM Ltd 2013*************************************   

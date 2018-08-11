@@ -28,9 +28,9 @@ extern void UART_send(uint8_t *pData, uint32_t length);
 extern void UART_receive(void);
 extern void UART_resetRxBuffer(void);
 //extern void UART_stop_receiving(void);
-extern uint8_t UART_getPacket(uint8_t *pBuffer,uint8_t maxLength);
+extern uint8_t UART_getPacket(uint8_t *pBuffer);
 
 void UART_Cancel(void);
 
 #endif
-// *******************************ARM University Program Copyright © ARM Ltd 2013*************************************   
+// *******************************ARM University Program Copyright ï¿½ ARM Ltd 2013*************************************   

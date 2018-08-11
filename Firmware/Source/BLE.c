@@ -156,10 +156,10 @@ enum opResult BLE_stdCommand(uint8_t *command)
 {
 	//BLE_Receive(sBLE.rxBuffer.dataBuffer,sizeof(sBLE.rxBuffer));
 	//Util_fillMemory(sBLE.rxBuffer.dataBuffer, sizeof(sBLE.rxBuffer), '\0'); //clear out Rx buffer between reads
-	BLE_Send(command,strlen(command));
+	BLE_Send(command,strlen((const char*)command));
 	BLE_Send("\r",1);
 	uint32_t events = osEventFlagsWait(BLE_Flags,BLE_MESSAGE_RECEIVED,osFlagsWaitAll,osWaitForever);
-	UART_getPacket(sBLE.rxQueue.entry[0].data.dataBuffer,MESSAGE_SIZE); //add Message to Queue, entry 0
+	UART_getPacket(sBLE.rxQueue.entry[0].data.dataBuffer); //add Message to Queue, entry 0
 	while(!BLE_searchForKeyword("OK",0)); //validate response in queue, entry 0
 
 	if(BLE_searchForKeyword("OK",0))
@@ -178,7 +178,7 @@ enum opResult BLE_stdCommand(uint8_t *command)
 
 static bool BLE_searchForKeyword(uint8_t * keyword, uint8_t queueEntryIndex)
 {
-	if(strstr(sBLE.rxQueue.entry[queueEntryIndex].data.dataBuffer,keyword)!=NULL)
+	if(strstr((const char *)sBLE.rxQueue.entry[queueEntryIndex].data.dataBuffer,(const char*)keyword)!=NULL)
 	{
 		return true;
 	}
@@ -200,10 +200,10 @@ void BLE_connectToDevice(const char *pBTAddress)
 {
 	//BLE_Receive(sBLE.rxBuffer.dataBuffer,sizeof(sBLE.rxBuffer));
 	BLE_Send("CON ",4);
-	BLE_Send(pBTAddress,BLE_ADDRESS_LENGTH);
+	BLE_Send((uint8_t *)pBTAddress,BLE_ADDRESS_LENGTH);
 	BLE_Send(" 0\r",3);
 	uint32_t events = osEventFlagsWait(BLE_Flags,BLE_MESSAGE_RECEIVED,osFlagsWaitAll,osWaitForever);
-	UART_getPacket(sBLE.rxQueue.entry[0].data.dataBuffer,MESSAGE_SIZE); //add Message to Queue, entry 0
+	UART_getPacket(sBLE.rxQueue.entry[0].data.dataBuffer); //add Message to Queue, entry 0
 	while(!BLE_searchForKeyword("CON=OK",0)); //validate response in queue, entry 0
 	//BLE_stopReceiving();
 }
@@ -211,7 +211,7 @@ void BLE_connectToDevice(const char *pBTAddress)
 void BLE_waitOnDevice(void)
 {
 	uint32_t events = osEventFlagsWait(BLE_Flags,BLE_MESSAGE_RECEIVED,osFlagsWaitAll,osWaitForever);
-	UART_getPacket(sBLE.rxQueue.entry[0].data.dataBuffer,MESSAGE_SIZE); //add Message to Queue, entry 0
+	UART_getPacket(sBLE.rxQueue.entry[0].data.dataBuffer); //add Message to Queue, entry 0
 	while(!BLE_searchForKeyword("READY",0)); //validate response in queue, entry 0
 	//UART_Cancel();
 }
@@ -276,29 +276,28 @@ static void BLE_stopReceiving(void)
 
 static void BLE_handleReceiveFlag(void)
 {
-	
+	//add messages in the UART buffer to the queue
+	//process all messages in queue
+	//clear queue
+
 	while(1)
 	{
-		
-			//Check if queue is full, if so return
-			//if(queueFull) return;
-		
-			uint32_t length = UART_getPacket()...
-			if(length == 0)
-				break;
-		
-		
+		//TODO: Check if queue is full, if so return
+		uint8_t length = UART_getPacket(sBLE.rxQueue.entry[sBLE.message_count].data.dataBuffer);
+		if(length == 0)
+			break; //no message added to queue
+		else
+		{
+			sBLE.message_count++;
+		}
 	}
-	
-	
-	uint8_t length = UART_getPacket(sBLE.rxQueue.entry[sBLE.message_count++].data.dataBuffer,MESSAGE_SIZE); //add Message to Queue
-	for(uint8_t queueEntry=0;queueEntry<sBLE.message_count;queueEntry++) //analyze messages in queue
+
+	for(uint8_t queueEntry=0; queueEntry < sBLE.message_count; queueEntry++)
 	{
 		if(BLE_searchForKeyword("RCV=",queueEntry))
 		{
-			//TODO: 
 			BLE_validatePacket(queueEntry);
-			//send data from packet to App thread
+			//TODO: send data from packet to App thread
 			
 		}
 		else if(BLE_searchForKeyword("CON=OK",queueEntry))
@@ -317,5 +316,8 @@ static void BLE_handleReceiveFlag(void)
 		{
 			Util_fillMemory(sBLE.rxQueue.entry[sBLE.message_count--].data.dataBuffer, MESSAGE_SIZE, '\0');
 		}
+		//once message has been processed, or if it was not something we care about, clear out that entry
+		Util_fillMemory(sBLE.rxQueue.entry[sBLE.message_count--].data.dataBuffer, MESSAGE_SIZE, '\0');
 	}
+	sBLE.message_count = 0; //all messages have been processed. Can begin adding to queue again
 }
