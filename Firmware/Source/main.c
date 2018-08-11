@@ -10,6 +10,7 @@
 #include "BLE.h"
 #include "DMA.h"
 #include "DAC.h"
+#include "LEDs.h"
 
 
 #ifdef RTE_Compiler_EventRecorder
@@ -29,12 +30,14 @@ int main (void) {
   EventRecorderInitialize(EventRecordError, 1U);
 #endif
   // ...
-	BLE_init();
 	Init_DMA_For_Playback();
 	Init_DAC();
+	Init_RGB_LEDs();
+	Control_RGB_LEDs(0,0,0);
 	
   osKernelInitialize();                 // Initialize CMSIS-RTOS
-	tid_TEST = osThreadNew(Thread_Testing, NULL, NULL);    // Create thread
+	tid_APP = osThreadNew(Thread_APP, NULL, NULL);    // Create thread
+	tid_BLE = osThreadNew(Thread_BLE, NULL, NULL);    // Create thread
 	DMA_flags = osEventFlagsNew(NULL);
   osKernelStart();                      // Start thread execution
   for (;;) {}

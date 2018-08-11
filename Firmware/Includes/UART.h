@@ -8,6 +8,8 @@
 #define BUS_CLOCK 						(24e6)
 #define SYS_CLOCK							(48e6)
 
+#define UART_BUFFER_SIZE 256
+
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -23,7 +25,10 @@ typedef void (*ISRCallback)(UARTOperationEnum op);
 
 extern void UART0_init(uint32_t baud_rate, ISRCallback callback);
 extern void UART_send(uint8_t *pData, uint32_t length);
-extern void UART_receive(uint8_t *pData, uint32_t length);
+extern void UART_receive(void);
+extern void UART_resetRxBuffer(void);
+//extern void UART_stop_receiving(void);
+extern uint8_t UART_getPacket(uint8_t *pBuffer,uint8_t maxLength);
 
 void UART_Cancel(void);
 

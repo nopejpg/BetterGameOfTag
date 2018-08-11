@@ -4,7 +4,7 @@
 .\objects\threads.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 .\objects\threads.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
 .\objects\threads.o: .\RTE\_Target_1\RTE_Components.h
-.\objects\threads.o: C:\Keil_v5\ARM\PACK\Keil\Kinetis_KLxx_DFP\1.14.0\Device\Include\MKL25Z4.h
+.\objects\threads.o: C:\Keil_v5\ARM\PACK\Keil\Kinetis_KLxx_DFP\1.15.0\Device\Include\MKL25Z4.h
 .\objects\threads.o: C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.3.0\CMSIS\Include\core_cm0plus.h
 .\objects\threads.o: C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.3.0\CMSIS\Include\cmsis_version.h
 .\objects\threads.o: C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.3.0\CMSIS\Include\cmsis_compiler.h
@@ -13,6 +13,7 @@
 .\objects\threads.o: .\Includes\BLE.h
 .\objects\threads.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdbool.h
 .\objects\threads.o: .\Includes\DMA.h
-.\objects\threads.o: C:\Keil_v5\ARM\PACK\Keil\Kinetis_KLxx_DFP\1.14.0\Device\Include\MKL25Z4.h
+.\objects\threads.o: C:\Keil_v5\ARM\PACK\Keil\Kinetis_KLxx_DFP\1.15.0\Device\Include\MKL25Z4.h
 .\objects\threads.o: .\Includes\safe_female.h
 .\objects\threads.o: .\Includes\not_female.h
+.\objects\threads.o: .\Includes\LEDs.h

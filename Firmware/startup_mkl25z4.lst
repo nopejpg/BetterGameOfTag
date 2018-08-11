@@ -611,7 +611,7 @@ work --depend=.\objects\startup_mkl25z4.d -o.\objects\startup_mkl25z4.o -I.\RTE
 \CMSIS -I.\RTE\Device\MKL25Z128xxx4 -I.\RTE\_Target_1 -IC:\Keil_v5\ARM\PACK\ARM
 \CMSIS\5.3.0\CMSIS\Include -IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.3.0\CMSIS\RTOS2\In
 clude -IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.3.0\CMSIS\RTOS2\RTX\Include -IC:\Keil_v
-5\ARM\PACK\Keil\Kinetis_KLxx_DFP\1.14.0\Device\Include --predefine="__EVAL SETA
+5\ARM\PACK\Keil\Kinetis_KLxx_DFP\1.15.0\Device\Include --predefine="__EVAL SETA
  1" --predefine="__UVISION_VERSION SETA 525" --predefine="_RTE_ SETA 1" --prede
 fine="MKL25Z128xxx4 SETA 1" --list=.\startup_mkl25z4.lst RTE\Device\MKL25Z128xx
 x4\startup_MKL25Z4.s

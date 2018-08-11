@@ -15,21 +15,23 @@
 static struct
 {
   ISRCallback callback;
-  uint8_t *pRxBuffer; //will be passed in by calling module
-  uint8_t rxBufferLength;
+  //uint8_t *pRxBuffer; //will be passed in by calling module
+	char rxCircularBuffer[UART_BUFFER_SIZE];
+  //uint32_t rxBufferLength;
   uint32_t numBytesReceived;
+	uint32_t startIndex;
 } sUART;
 
 extern void UART0_init(uint32_t baud_rate, ISRCallback callback)
 {
   sUART.callback = callback;
-  sUART.pRxBuffer = NULL;
-  sUART.rxBufferLength = 0;
+  //sUART.pRxBuffer = NULL;
+  //sUART.rxBufferLength = 0;
   sUART.numBytesReceived = 0;
   
   //the rest of the init goes here
 	uint16_t sbr;
-	uint8_t temp;
+	volatile uint8_t temp;
 
 	// Enable clock gating for UART0 and Port A
 	SIM->SCGC4 |= SIM_SCGC4_UART0_MASK; 										
@@ -73,10 +75,6 @@ extern void UART0_init(uint32_t baud_rate, ISRCallback callback)
 	// Send LSB first, do not invert received data
 	UART0->S2 = UART0_S2_MSBF(0) | UART0_S2_RXINV(0); 
 
-	// Enable interrupts. Listing 8.11 on p. 234
-	//Q_Init(&TxQ);
-	//Q_Init(&RxQ);
-
 	NVIC_SetPriority(UART0_IRQn, 2); // 0, 1, 2, or 3
 	NVIC_ClearPendingIRQ(UART0_IRQn); 
 	NVIC_EnableIRQ(UART0_IRQn);
@@ -95,42 +93,43 @@ extern void UART0_init(uint32_t baud_rate, ISRCallback callback)
 extern void UART_send(uint8_t *pData, uint32_t length)
 {
   UART0->C2 |= UART_C2_TE(1); //enables UART transmitter
-  for(uint32_t i=0;i<length-1;i++)
+  for(uint32_t i=0;i<length;i++)
   {
     while(!(UART0->S1 & UART0_S1_TDRE_MASK));
     UART0->D = pData[i];
   }
+	if(sUART.callback)
+		sUART.callback(IO_WRITE); //signal to BLE (or other calling module) that we are done sending
 }
 
 
-extern void UART_receive(uint8_t *pDest, uint32_t length) //length will probably be the max length of our buffer
+extern void UART_receive(void)
 {
-  sUART.pRxBuffer = pDest;
-  sUART.rxBufferLength = length;
+  //sUART.rxBufferLength = length;
+	sUART.startIndex = 0;
+	sUART.numBytesReceived = 0;
+	Util_fillMemory(sUART.rxCircularBuffer, UART_BUFFER_SIZE, '\0'); //clear out Rx buffer
 
   UART0->C2 |= UART_C2_RE(1); //enables UART Receiver
 }
 
 
 
-void UART0_isr(void)
+void UART0_IRQHandler(void)
 {
-	uint8_t dummy_read;
+	volatile uint8_t dummy_read;
   uint32_t status_reg = UART0->S1;
 	
   if(status_reg & UART0_S1_RDRF_MASK) //if ISR triggered by received character
   {
     uint8_t received_val = UART0->D;
-    if(sUART.numBytesReceived < sUART.rxBufferLength && sUART.pRxBuffer) //if we have room to receive, and the Rx buffer exists
+    sUART.rxCircularBuffer[sUART.numBytesReceived++] = received_val;
+		if(sUART.numBytesReceived > 255) //handle wrap around
+		{
+			sUART.numBytesReceived = 0;
+		}
+    if(received_val == '\r') //if we are done receiving
     {
-      sUART.pRxBuffer[sUART.numBytesReceived++] = received_val;
-    }
-    if(sUART.numBytesReceived >= sUART.rxBufferLength || received_val == '\0') //if we are done receiving
-    {
-      //UART_stop_receiving(); //Not needed yet. Will be needed when we are parsing packets.
-	  sUART.pRxBuffer = NULL;
-	  sUART.rxBufferLength = 0;
-	  sUART.numBytesReceived = 0;
       if(sUART.callback)
         sUART.callback(IO_RECEIVE); //signal to BLE (or other calling module) that we are done receiving
     }
@@ -140,10 +139,10 @@ void UART0_isr(void)
 		UART_S1_FE_MASK | UART_S1_PF_MASK))
   {
 	// clear the error flags
-	UART0->S1 |= UART0_S1_OR_MASK | UART0_S1_NF_MASK | 
-				UART0_S1_FE_MASK | UART0_S1_PF_MASK;	
-	// read the data register to clear RDRF
-	dummy_read = UART0->D;
+		UART0->S1 |= UART0_S1_OR_MASK | UART0_S1_NF_MASK | 
+					UART0_S1_FE_MASK | UART0_S1_PF_MASK;	
+		// read the data register to clear RDRF
+		dummy_read = UART0->D;
     if(sUART.callback)
       sUART.callback(IO_ERROR); //signal to BLE (or other calling module) that we encountered an error
   }
@@ -151,10 +150,35 @@ void UART0_isr(void)
 
 void UART_Cancel(void){
 	UART0->C2 &= ~UART_C2_RE(1); //disables UART Receiver
-	UART0->C2 &= ~UART0_C2_TE(1); //disables UART Transmitter
-	Util_fillMemory(sUART.pRxBuffer, sUART.rxBufferLength, '\0'); //clear out Rx buffer
+	//UART0->C2 &= ~UART0_C2_TE(1); //disables UART Transmitter
+	Util_fillMemory(sUART.rxCircularBuffer, UART_BUFFER_SIZE, '\0'); //clear out Rx buffer
 	//TODO: Also clear our Tx buffer?
 }
 
+uint8_t UART_getPacket(uint8_t *pBuffer,uint8_t maxLength)
+{
+	//TODO: look at the emailed copy
+	//the purpose of this function is to take message (string up to \r) and put it into BLE message queue
+	uint32_t currentIndex = sUART.startIndex;
+	uint8_t bytesCopied =0;
+	while((sUART.rxCircularBuffer[currentIndex] != '\r') && (currentIndex<maxLength))
+	{
+		pBuffer[currentIndex++] = sUART.rxCircularBuffer[currentIndex];
+		bytesCopied++;
+		if(currentIndex >= sizeof(sUART.rxCircularBuffer)) //handle wrap-around
+		{
+			currentIndex = 0;
+		}
+	}
+	sUART.startIndex = currentIndex+1; //next start index is one after the \r
+	return bytesCopied;
+}
+
+void UART_resetRxBuffer(void)
+{
+	Util_fillMemory((uint8_t*)sUART.rxCircularBuffer, UART_BUFFER_SIZE, '\0');
+	sUART.startIndex=0;
+	sUART.numBytesReceived=0;
+}
 
 // *******************************ARM University Program Copyright © ARM Ltd 2013*************************************   
