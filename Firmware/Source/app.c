@@ -1,12 +1,13 @@
-#include "threads.h"
 #include "RTE_Components.h"
 #include CMSIS_device_header
 #include "cmsis_os2.h"
+#include "app.h"
 #include "BLE.h"
 #include "DMA.h"
 #include "safe_female.h"
 #include "not_female.h"
 #include "LEDs.h"
+
 
 osThreadId_t tid_APP;
 

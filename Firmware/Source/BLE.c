@@ -48,22 +48,21 @@ static struct
   //Packet rxBuffer;
 	Queue rxQueue;
 	uint8_t message_count;
+	BLE_moduleState BLE_currentModuleState;
 } sBLE;
 
-static BLE_moduleState BLE_stateOfModule;
-static Packet txBuffer;
+//static BLE_moduleState BLE_stateOfModule;
+//static Packet txBuffer;
 osThreadId_t tid_BLE;
 
 static void BLE_handleUARTCB(UARTOperationEnum op);
 static void BLE_Send(uint8_t *pData, uint32_t length);
-static void BLE_Receive(uint8_t *pDest, uint32_t length);
 static void BLE_enterCentral(void);
 static void BLE_waitOnDevice(void);
 static uint8_t BLE_BuildPacket(const char *pString);
 static bool BLE_validatePacket(uint8_t queueEntryIndex);
 void BLE_SendPacket(const char *pString);
 void BLE_issueResetCommand(void);
-static void BLE_stopReceiving(void);
 static void BLE_handleReceiveFlag(void);
 static bool BLE_searchForKeyword(uint8_t * keyword, uint8_t queueEntryIndex);
 
@@ -72,8 +71,6 @@ void BLE_init(void)
 	sBLE.message_count=0;
 	BLE_Flags = osEventFlagsNew(NULL);
   UART0_init(9600,&BLE_handleUARTCB);
-	//BLE_Receive(sBLE.rxBuffer.dataBuffer,sizeof(sBLE.rxBuffer));
-	//BLE_waitOnDevice();
 #ifdef IS_HUB_DEVICE
 	BLE_enterCentral();
 #else
@@ -121,7 +118,6 @@ static void BLE_handleUARTCB(UARTOperationEnum op)
     UART_Cancel();
     break;
   case IO_RECEIVE:
-		//BLE_Flags |= BLE_receiveSuccessful;
 		osEventFlagsSet(BLE_Flags, BLE_MESSAGE_RECEIVED);
     break;
 	case IO_WRITE:
@@ -137,11 +133,6 @@ static void BLE_Send(uint8_t *pData, uint32_t length)
 	UART_send(pData, length); //TODO: this should be getting passed the transmit buffer?
 }
 
-static void BLE_Receive(uint8_t *pDest, uint32_t length)
-{
-	UART_receive();
-}
-
 enum opResult BLE_Advertise(void)
 {
 	return SUCCESS;
@@ -154,24 +145,21 @@ enum opResult BLE_noAdvertise(void)
 
 enum opResult BLE_stdCommand(uint8_t *command)
 {
-	//BLE_Receive(sBLE.rxBuffer.dataBuffer,sizeof(sBLE.rxBuffer));
-	//Util_fillMemory(sBLE.rxBuffer.dataBuffer, sizeof(sBLE.rxBuffer), '\0'); //clear out Rx buffer between reads
+	sBLE.BLE_currentModuleState = SENDING_COMMAND;
 	BLE_Send(command,strlen((const char*)command));
 	BLE_Send("\r",1);
+	sBLE.BLE_currentModuleState = AWAITING_RESPONSE;
 	uint32_t events = osEventFlagsWait(BLE_Flags,BLE_MESSAGE_RECEIVED,osFlagsWaitAll,osWaitForever);
-	UART_getPacket(sBLE.rxQueue.entry[0].data.dataBuffer); //add Message to Queue, entry 0
-	while(!BLE_searchForKeyword("OK",0)); //validate response in queue, entry 0
+	
+	BLE_handleReceiveFlag();
 
-	if(BLE_searchForKeyword("OK",0))
+	if(sBLE.BLE_currentModuleState == RESPONSE_RECEIVED)
 	{
-		Util_fillMemory(sBLE.rxQueue.entry[0].data.dataBuffer, MESSAGE_SIZE, '\0');
-		UART_resetRxBuffer();
+		sBLE.BLE_currentModuleState = IDLE;
 		return SUCCESS;
 	}
 	else
 	{
-		Util_fillMemory(sBLE.rxQueue.entry[0].data.dataBuffer, MESSAGE_SIZE, '\0');
-		UART_resetRxBuffer();
 		return TIMEOUT_ERROR;
 	}
 }
@@ -198,30 +186,29 @@ void BLE_enterCentral(void)
 
 void BLE_connectToDevice(const char *pBTAddress)
 {
-	//BLE_Receive(sBLE.rxBuffer.dataBuffer,sizeof(sBLE.rxBuffer));
+	sBLE.BLE_currentModuleState = SENDING_COMMAND;
 	BLE_Send("CON ",4);
 	BLE_Send((uint8_t *)pBTAddress,BLE_ADDRESS_LENGTH);
 	BLE_Send(" 0\r",3);
+	sBLE.BLE_currentModuleState = AWAITING_RESPONSE;
 	uint32_t events = osEventFlagsWait(BLE_Flags,BLE_MESSAGE_RECEIVED,osFlagsWaitAll,osWaitForever);
-	UART_getPacket(sBLE.rxQueue.entry[0].data.dataBuffer); //add Message to Queue, entry 0
-	while(!BLE_searchForKeyword("CON=OK",0)); //validate response in queue, entry 0
-	//BLE_stopReceiving();
+	BLE_handleReceiveFlag();
 }
 
 void BLE_waitOnDevice(void)
 {
 	uint32_t events = osEventFlagsWait(BLE_Flags,BLE_MESSAGE_RECEIVED,osFlagsWaitAll,osWaitForever);
-	UART_getPacket(sBLE.rxQueue.entry[0].data.dataBuffer); //add Message to Queue, entry 0
-	while(!BLE_searchForKeyword("READY",0)); //validate response in queue, entry 0
-	//UART_Cancel();
+	BLE_handleReceiveFlag();
 }
 
 void BLE_issueResetCommand(void)
 {
-	//BLE_Receive(sBLE.rxBuffer.dataBuffer,sizeof(sBLE.rxBuffer));
+	sBLE.BLE_currentModuleState = SENDING_COMMAND;
+	uint32_t events = osEventFlagsWait(BLE_Flags,BLE_MESSAGE_RECEIVED,osFlagsNoClear,0);
 	BLE_Send("rst\r",4);
+	sBLE.BLE_currentModuleState = AWAITING_RESPONSE;
 	BLE_waitOnDevice();
-	//BLE_stopReceiving();
+	sBLE.BLE_currentModuleState = IDLE;
 }
 
 uint8_t BLE_BuildPacket(const char *pString)
@@ -233,10 +220,10 @@ uint8_t BLE_BuildPacket(const char *pString)
 	}
 	uint16_t dataCRC = Util_crc16(pString, dataLength);
 	
-	txBuffer.pkt.header.startByte = PACKET_START_BYTE;
-	txBuffer.pkt.header.length = (uint8_t)dataLength;
-	Util_copyMemory((uint8_t *)pString,txBuffer.pkt.data,dataLength);
-	Util_copyMemory((uint8_t *)&dataCRC,&txBuffer.pkt.data[dataLength],sizeof(dataCRC));
+	sBLE.txBuffer.pkt.header.startByte = PACKET_START_BYTE;
+	sBLE.txBuffer.pkt.header.length = (uint8_t)dataLength;
+	Util_copyMemory((uint8_t *)pString,sBLE.txBuffer.pkt.data,dataLength);
+	Util_copyMemory((uint8_t *)&dataCRC,&sBLE.txBuffer.pkt.data[dataLength],sizeof(dataCRC));
 	
 	return (sizeof(PacketHeader) + dataLength + sizeof(dataCRC));
 }
@@ -246,11 +233,9 @@ void BLE_SendPacket(const char *pString)
 	uint8_t packetLength = BLE_BuildPacket(pString);
 	if(packetLength > 0)
 	{
-		//BLE_Receive(sBLE.rxBuffer.dataBuffer,sizeof(sBLE.rxBuffer));
-		BLE_Send("SND",3);
+		BLE_Send("SND ",4);
 		BLE_Send(sBLE.txBuffer.dataBuffer,packetLength);
 		BLE_Send("\r",1);
-		//BLE_stopReceiving();
 	}
 }
 
@@ -269,17 +254,14 @@ bool BLE_validatePacket(uint8_t queueEntryIndex)
 	}
 }
 
-static void BLE_stopReceiving(void)
-{
-	//UART_stop_receiving();
-}
-
 static void BLE_handleReceiveFlag(void)
 {
 	//add messages in the UART buffer to the queue
 	//process all messages in queue
 	//clear queue
 
+	osDelay(250); //wait for all possible response messages to finish coming in.
+	osEventFlagsClear(BLE_Flags,BLE_MESSAGE_RECEIVED); //waiting for messages to come in caused flag to be set again. Clear to prevent prematurely entering later functions.
 	while(1)
 	{
 		//TODO: Check if queue is full, if so return
@@ -302,22 +284,25 @@ static void BLE_handleReceiveFlag(void)
 		}
 		else if(BLE_searchForKeyword("CON=OK",queueEntry))
 		{
-			//Change from "waiting to connection" to "connected" state
+			//TODO: Change from "waiting to connection" to "connected" state
 		}
 		else if(BLE_searchForKeyword("OK",queueEntry))
 		{
-			//Change from "waiting on response" to "checking response" state
+			//Change from "waiting on response" to "response received" state
+			sBLE.BLE_currentModuleState = RESPONSE_RECEIVED;
 		}
 		else if(BLE_searchForKeyword("ERR",queueEntry))
 		{
-			//Change from "waiting on response" to "checking response" state
+			//Change from "waiting on response" to "error" state
+			sBLE.BLE_currentModuleState = ERROR_STATE;
 		}
-		else //throw out message
+		else if(BLE_searchForKeyword("READY",queueEntry))
 		{
-			Util_fillMemory(sBLE.rxQueue.entry[sBLE.message_count--].data.dataBuffer, MESSAGE_SIZE, '\0');
+			//Change from "waiting on response" to "response received" state
+			sBLE.BLE_currentModuleState = RESPONSE_RECEIVED;
 		}
 		//once message has been processed, or if it was not something we care about, clear out that entry
-		Util_fillMemory(sBLE.rxQueue.entry[sBLE.message_count--].data.dataBuffer, MESSAGE_SIZE, '\0');
+		Util_fillMemory(sBLE.rxQueue.entry[queueEntry].data.dataBuffer, MESSAGE_SIZE, '\0');
 	}
 	sBLE.message_count = 0; //all messages have been processed. Can begin adding to queue again
 }

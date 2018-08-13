@@ -183,6 +183,7 @@ uint8_t UART_getPacket(uint8_t *pBuffer)
 		if(sUART.rxCircularBuffer[(sUART.startIndex + packetSize)%UART_BUFFER_SIZE] == '\r')
 		{
 			packetFound = true;
+			packetSize++; //increment here, because it does not increment before breaking out of loop.
 			break;
 		}
 	}
@@ -218,6 +219,7 @@ uint8_t UART_getPacket(uint8_t *pBuffer)
 void UART_resetRxBuffer(void)
 {
 	Util_fillMemory((uint8_t*)sUART.rxCircularBuffer, UART_BUFFER_SIZE, '\0');
+	sUART.rxCircularBuffer[UART_BUFFER_SIZE - 1] = '\r';
 	sUART.startIndex=0;
 	sUART.rxIndex=0;
 }
@@ -234,7 +236,8 @@ static uint32_t UART_decrementIndex(uint32_t index, uint32_t count)
   if(index >= count)
     retIndex = index - count;
   else
-    retIndex = UART_BUFFER_SIZE - (count - index + 1);
+    //retIndex = UART_BUFFER_SIZE - (count - index + 1);
+		retIndex = UART_BUFFER_SIZE - (count - index);
   
   return retIndex;
 }
