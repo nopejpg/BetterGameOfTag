@@ -6,7 +6,7 @@
 #include  CMSIS_device_header
 #include "cmsis_os2.h"
 
-#include "threads.h"
+#include "app.h"
 #include "BLE.h"
 #include "DMA.h"
 #include "DAC.h"
@@ -16,6 +16,7 @@
 #ifdef RTE_Compiler_EventRecorder
 #include "EventRecorder.h"
 #endif
+
  
 /*----------------------------------------------------------------------------
  * Application main thread
@@ -38,6 +39,9 @@ int main (void) {
   osKernelInitialize();                 // Initialize CMSIS-RTOS
 	tid_APP = osThreadNew(Thread_APP, NULL, NULL);    // Create thread
 	tid_BLE = osThreadNew(Thread_BLE, NULL, NULL);    // Create thread
+	//receivedMessageQ_id = osMessageQueueNew(1,sizeof(uint8_t*),NULL);
+	
+	
 	DMA_flags = osEventFlagsNew(NULL);
   osKernelStart();                      // Start thread execution
   for (;;) {}

@@ -335,7 +335,7 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls></MiscControls>
-              <Define>IS_HUB_DEVICE</Define>
+              <Define>IS_HUB_DEVICEx</Define>
               <Undefine></Undefine>
               <IncludePath>.\Includes</IncludePath>
             </VariousControls>
@@ -402,11 +402,6 @@
               <FilePath>.\Source\packets.c</FilePath>
             </File>
             <File>
-              <FileName>threads.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Source\threads.c</FilePath>
-            </File>
-            <File>
               <FileName>queue.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\Source\queue.c</FilePath>
@@ -440,6 +435,11 @@
               <FileName>LEDs.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\Source\LEDs.c</FilePath>
+            </File>
+            <File>
+              <FileName>app.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Source\app.c</FilePath>
             </File>
           </Files>
         </Group>

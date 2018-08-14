@@ -10,6 +10,6 @@
 .\objects\dma.o: C:\Keil_v5\ARM\PACK\Keil\Kinetis_KLxx_DFP\1.15.0\Device\Include\MKL25Z4.h
 .\objects\dma.o: .\Includes\timers.h
 .\objects\dma.o: C:\Keil_v5\ARM\PACK\Keil\Kinetis_KLxx_DFP\1.15.0\Device\Include\MKL25Z4.h
-.\objects\dma.o: .\Includes\threads.h
+.\objects\dma.o: .\Includes\app.h
 .\objects\dma.o: C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.3.0\CMSIS\RTOS2\Include\cmsis_os2.h
 .\objects\dma.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h

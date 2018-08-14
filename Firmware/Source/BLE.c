@@ -4,6 +4,7 @@
 #include "stdlib.h"
 #include "string.h"
 #include "utilities.h"
+#include "app.h"
 
 //UART_receive(rxBuffer, sizeof(rxBuffer));
 
@@ -34,7 +35,7 @@ typedef union
 
 typedef struct
 {
-	Packet data;
+	uint8_t data[PACKET_SIZE];
 }QueueElement;
 
 typedef struct
@@ -45,7 +46,7 @@ typedef struct
 static struct
 {
   Packet txBuffer;
-  //Packet rxBuffer;
+  Packet rxPacket;
 	Queue rxQueue;
 	uint8_t message_count;
 	BLE_moduleState BLE_currentModuleState;
@@ -81,8 +82,9 @@ void BLE_init(void)
 void Thread_BLE(void *arg)
 {
 	BLE_init();
-	BLE_connectToDevice("20FABB049EBC");
-	BLE_SendPacket("test packet");
+	receivedMessageQ_id = osMessageQueueNew(1,sizeof(Packet),NULL);
+	//BLE_connectToDevice("20FABB049EBC");
+	//BLE_SendPacket("UNSAFE");
 	while(1)
 	{
 		uint32_t flagsToWaitFor = (BLE_MESSAGE_RECEIVED|BLE_MESSAGE_READY_FOR_TRANSMIT);
@@ -166,7 +168,7 @@ enum opResult BLE_stdCommand(uint8_t *command)
 
 static bool BLE_searchForKeyword(uint8_t * keyword, uint8_t queueEntryIndex)
 {
-	if(strstr((const char *)sBLE.rxQueue.entry[queueEntryIndex].data.dataBuffer,(const char*)keyword)!=NULL)
+	if(strstr((const char *)sBLE.rxQueue.entry[queueEntryIndex].data,(const char*)keyword)!=NULL)
 	{
 		return true;
 	}
@@ -242,9 +244,9 @@ void BLE_SendPacket(const char *pString)
 bool BLE_validatePacket(uint8_t queueEntryIndex)
 {
 	//validate packet's CRC
-	uint8_t receivedDataLength = sBLE.rxQueue.entry[queueEntryIndex].data.pkt.header.length;
-	uint16_t crcValue = Util_crc16(sBLE.rxQueue.entry[queueEntryIndex].data.pkt.data, receivedDataLength);
-	if(crcValue == *((uint16_t *)sBLE.rxQueue.entry[queueEntryIndex].data.dataBuffer) + receivedDataLength)
+	uint8_t receivedDataLength = sBLE.rxPacket.pkt.header.length;
+	uint16_t crcValue = Util_crc16(sBLE.rxPacket.pkt.data, receivedDataLength);
+	if(crcValue == *((uint16_t *)(sBLE.rxPacket.dataBuffer + receivedDataLength + 2)))
 	{
 		return true;
 	}
@@ -265,7 +267,7 @@ static void BLE_handleReceiveFlag(void)
 	while(1)
 	{
 		//TODO: Check if queue is full, if so return
-		uint8_t length = UART_getPacket(sBLE.rxQueue.entry[sBLE.message_count].data.dataBuffer);
+		uint8_t length = UART_getPacket(sBLE.rxQueue.entry[sBLE.message_count].data);
 		if(length == 0)
 			break; //no message added to queue
 		else
@@ -278,9 +280,14 @@ static void BLE_handleReceiveFlag(void)
 	{
 		if(BLE_searchForKeyword("RCV=",queueEntry))
 		{
-			BLE_validatePacket(queueEntry);
-			//TODO: send data from packet to App thread
-			
+			uint32_t testing = strlen((const char *)sBLE.rxQueue.entry[queueEntry].data)-8;
+			Util_copyMemory(&sBLE.rxQueue.entry[queueEntry].data[4], sBLE.rxPacket.dataBuffer, strlen((const char *)sBLE.rxQueue.entry[queueEntry].data)-6); //-8 for RCV=\r\n
+			if(BLE_validatePacket(queueEntry))
+			{
+				//TODO: send data from packet to App thread
+				osMessageQueuePut(receivedMessageQ_id,&sBLE.rxPacket.pkt.data,NULL,1000); //send received message to app thread
+				osEventFlagsWait(BLE_Flags,BLE_RECEIVED_MESSAGE_TRANSFERRED,osFlagsWaitAll,3000); //wait until received message has been copied over to app thread variable before deleting.
+			}
 		}
 		else if(BLE_searchForKeyword("CON=OK",queueEntry))
 		{
@@ -302,7 +309,7 @@ static void BLE_handleReceiveFlag(void)
 			sBLE.BLE_currentModuleState = RESPONSE_RECEIVED;
 		}
 		//once message has been processed, or if it was not something we care about, clear out that entry
-		Util_fillMemory(sBLE.rxQueue.entry[queueEntry].data.dataBuffer, MESSAGE_SIZE, '\0');
+		Util_fillMemory(sBLE.rxQueue.entry[queueEntry].data, MESSAGE_SIZE, '\0');
 	}
 	sBLE.message_count = 0; //all messages have been processed. Can begin adding to queue again
 }

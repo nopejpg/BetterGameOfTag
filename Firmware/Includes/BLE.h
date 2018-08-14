@@ -9,6 +9,7 @@
 #define BLE_TRANSMIT_SUCCESS (1UL << 1)
 #define BLE_EXPECTING_RESPONSE (1UL << 2)
 #define BLE_MESSAGE_READY_FOR_TRANSMIT (1UL << 3)
+#define BLE_RECEIVED_MESSAGE_TRANSFERRED (1U << 4)
 
 
 #define PACKET_START_BYTE 0xFD
@@ -24,14 +25,17 @@ typedef enum
 {
 	SENDING_COMMAND,
 	AWAITING_RESPONSE,
-	PROCESSING_RESPONSE,
-	IDLE
+	RESPONSE_RECEIVED,
+	IDLE,
+	ERROR_STATE
 } BLE_moduleState;
 
 extern osEventFlagsId_t BLE_Flags;
+extern osThreadId_t tid_BLE;
 								 
 								 
 void BLE_init(void);
+void Thread_BLE(void * arg);
 void BLE_SendPacket(const char *pString);
 void BLE_connectToDevice(const char *pBTAddress);
 enum opResult BLE_Advertise(void);

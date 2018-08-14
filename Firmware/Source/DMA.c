@@ -1,7 +1,7 @@
 #include "DMA.h"
 #include <MKL25Z4.h>
 #include "timers.h"
-#include "threads.h"
+#include "app.h"
 
 static const char * Reload_DMA_Source=0;
 static uint32_t Reload_DMA_Byte_Count=0;
