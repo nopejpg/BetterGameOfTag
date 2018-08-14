@@ -40,32 +40,44 @@ typedef union
 static struct
 {
 	Packet rxMessage;
-	APP_commState commState;
 }sAPP;
 
-void Thread_APP(void *arg)
+#ifdef IS_HUB_DEVICE
+void Thread_APP_HUB(void *arg)
+{
+	uint32_t flags = osThreadFlagsWait(BLE_INIT_AND_CONNECTED,osFlagsWaitAll,osWaitForever); //ensure BLE module is set up before attempting to send commands to it
+	while(1)
+	{
+		BLE_SendCommand("SAFE");
+		osDelay(3000);
+		BLE_SendCommand("UNSAFE");
+		osDelay(3000);
+	}
+}
+#else
+void Thread_APP_POD(void *arg)
 {
 	while(1)
 	{
 		result = osMessageQueueGet(receivedMessageQ_id, &sAPP.rxMessage, NULL, 1000);
 		if(result == osOK)
 		{
-			osEventFlagsSet(BLE_Flags,BLE_RECEIVED_MESSAGE_TRANSFERRED);
+			osEventFlagsSet(BLE_Flags,BLE_RECEIVED_MESSAGE_TRANSFERRED); //let BLE module know that we are done with it's data, and that it is free to clear it
 			if(strstr((const char *)sAPP.rxMessage.dataBuffer,"UNSAFE") != NULL) //if SAFE message
 			{
-				asm("NOP"); //testing TODO: replace
+				BLE_SendAck();
 				Control_RGB_LEDs(1,0,0);
 			}
 			else if(strstr((const char *)sAPP.rxMessage.dataBuffer,"SAFE") != NULL) //if UNSAFE message
 			{
-				asm("NOP"); //testing TODO: replace
+				BLE_SendAck();
 				Control_RGB_LEDs(0,1,0);
 			}
-			else if(strstr((const char *)sAPP.rxMessage.dataBuffer,"ACK") != NULL) //if ACK message
-			{
-				asm("NOP"); //testing TODO: replace
-			}
 		}
-		//osThreadYield();
 	}
 }
+#endif
+
+
+
+

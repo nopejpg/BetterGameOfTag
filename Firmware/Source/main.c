@@ -37,7 +37,11 @@ int main (void) {
 	Control_RGB_LEDs(0,0,0);
 	
   osKernelInitialize();                 // Initialize CMSIS-RTOS
-	tid_APP = osThreadNew(Thread_APP, NULL, NULL);    // Create thread
+#ifdef IS_HUB_DEVICE
+	tid_APP = osThreadNew(Thread_APP_HUB, NULL, NULL);    // Create hub's app thread
+#else
+	tid_APP = osThreadNew(Thread_APP_POD, NULL, NULL);    // Create pod's app thread
+#endif
 	tid_BLE = osThreadNew(Thread_BLE, NULL, NULL);    // Create thread
 	//receivedMessageQ_id = osMessageQueueNew(1,sizeof(uint8_t*),NULL);
 	
