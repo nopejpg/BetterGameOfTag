@@ -1,0 +1,41 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 26
+    buildToolsVersion '26.0.2'
+    defaultConfig {
+        applicationId "com.bluecreation.melodysmartandroid"
+        minSdkVersion 18
+        targetSdkVersion 25
+        versionCode 35
+        versionName "2.3"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    dataBinding {
+        enabled true
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
+    compile project(':melodysmart')
+    compile 'com.android.support:appcompat-v7:26.0.0'
+    compile 'com.google.code.gson:gson:2.7'
+    compile 'com.android.support:design:26.0.0'
+
+    compile('com.mikepenz:fastadapter:2.6.3@aar') {
+        transitive = true
+    }
+    compile 'com.mikepenz:fastadapter-commons:2.6.3@aar'
+
+    testCompile 'junit:junit:4.12'
+}

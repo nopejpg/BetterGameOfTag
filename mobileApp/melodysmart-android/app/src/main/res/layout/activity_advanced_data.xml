@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout>
+
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    tools:context="com.bluecreation.melodysmartandroid.AdvancedDataActivity">
+
+    <android.support.design.widget.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/AppTheme.AppBarOverlay">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            app:popupTheme="@style/AppTheme.PopupOverlay" />
+
+    </android.support.design.widget.AppBarLayout>
+
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/content_advanced_data"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_vertical_margin"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        tools:context="com.bluecreation.melodysmartandroid.AdvancedDataActivity"
+        tools:showIn="@layout/activity_advanced_data">
+
+        <Switch
+            android:id="@+id/swEcho"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:text="Echo" />
+
+        <Switch
+            android:id="@+id/swLogging"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/swEcho"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="8dp"
+            android:text="Logging" />
+
+        <TextView
+            android:id="@+id/tvLoggedDataSize"
+            android:layout_height="wrap_content"
+            android:layout_width="200dp"
+            android:layout_below="@+id/swLogging"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="8dp"
+            android:text="Logged data size: 0b" />
+
+        <Button
+            android:id="@+id/btnSendOverEmail"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tvLoggedDataSize"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="16dp"
+            android:onClick="sendDataOverEmail"
+            android:text="Send over EMail" />
+
+        <Button
+            android:id="@+id/btnSendOverBle"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/btnSendOverEmail"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="8dp"
+            android:onClick="sendDataOverBle"
+            android:text="Send over BLE" />
+
+        <Button
+            android:id="@+id/btnClearData"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/btnSendOverBle"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="8dp"
+            android:onClick="clearData"
+            android:text="Clear Data" />
+
+    </RelativeLayout>
+
+</android.support.design.widget.CoordinatorLayout>
+
+</layout>

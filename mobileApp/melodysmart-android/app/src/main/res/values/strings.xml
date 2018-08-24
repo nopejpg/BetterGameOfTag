@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">MelodySmart</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <color name="gray">#eeeeee</color>
+    <string name="title_activity_device">Device Control</string>
+    <string name="title_activity_scan">Scan</string>
+    <string name="title_activity_advanced_data">Advanced Data</string>
+    <string name="title_activity_remote_commands">Remote Commands</string>
+    <string name="title_activity_i2c">I2cActivity</string>
+    <string name="item_separator">/</string>
+    <string name="signal_strength">Signal strength</string>
+</resources>
