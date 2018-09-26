@@ -83,6 +83,11 @@ void Thread_APP_POD(void *arg)
 				Play_Recording(Safe_Audio,sizeof(Safe_Audio)/sizeof(Safe_Audio[0]));
 				osEventFlagsWait(DMA_flags,DMA_REC_COMPLETE, osFlagsWaitAll, osWaitForever);
 			}
+			else if(strstr((const char *)sAPP.rxMessage.dataBuffer,"WARNING") != NULL) //if WARNING message
+			{
+				BLE_SendAck();
+				Control_RGB_LEDs(1,1,0);
+			}
 			else if(strstr((const char *)sAPP.rxMessage.dataBuffer,"GO") != NULL) //if GO message
 			{
 				BLE_SendAck();
