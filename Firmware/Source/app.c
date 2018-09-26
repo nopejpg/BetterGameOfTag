@@ -4,8 +4,12 @@
 #include "app.h"
 #include "BLE.h"
 #include "DMA.h"
-#include "safe_female.h"
-#include "not_female.h"
+//#include "safe_female.h"
+//#include "not_female.h"
+#include "Safe_Audio.h"
+#include "Not_Audio.h"
+#include "Go_Audio.h"
+#include "Stop_Audio.h"
 #include "LEDs.h"
 #include "string.h"
 
@@ -67,11 +71,31 @@ void Thread_APP_POD(void *arg)
 			{
 				BLE_SendAck();
 				Control_RGB_LEDs(1,0,0);
+				Play_Recording(Not_Audio,sizeof(Not_Audio)/sizeof(Not_Audio[0]));
+				osEventFlagsWait(DMA_flags,DMA_REC_COMPLETE, osFlagsWaitAll, osWaitForever);
+				Play_Recording(Safe_Audio,sizeof(Safe_Audio)/sizeof(Safe_Audio[0]));
+				osEventFlagsWait(DMA_flags,DMA_REC_COMPLETE, osFlagsWaitAll, osWaitForever);
 			}
 			else if(strstr((const char *)sAPP.rxMessage.dataBuffer,"SAFE") != NULL) //if UNSAFE message
 			{
 				BLE_SendAck();
 				Control_RGB_LEDs(0,1,0);
+				Play_Recording(Safe_Audio,sizeof(Safe_Audio)/sizeof(Safe_Audio[0]));
+				osEventFlagsWait(DMA_flags,DMA_REC_COMPLETE, osFlagsWaitAll, osWaitForever);
+			}
+			else if(strstr((const char *)sAPP.rxMessage.dataBuffer,"GO") != NULL) //if GO message
+			{
+				BLE_SendAck();
+				Control_RGB_LEDs(0,1,0);
+				Play_Recording(Go_Audio,sizeof(Go_Audio)/sizeof(Go_Audio[0]));
+				osEventFlagsWait(DMA_flags,DMA_REC_COMPLETE, osFlagsWaitAll, osWaitForever);
+			}
+			else if(strstr((const char *)sAPP.rxMessage.dataBuffer,"STOP") != NULL) //if STOP message
+			{
+				BLE_SendAck();
+				Control_RGB_LEDs(1,0,0);
+				Play_Recording(Stop_Audio,sizeof(Stop_Audio)/sizeof(Stop_Audio[0]));
+				osEventFlagsWait(DMA_flags,DMA_REC_COMPLETE, osFlagsWaitAll, osWaitForever);
 			}
 		}
 	}

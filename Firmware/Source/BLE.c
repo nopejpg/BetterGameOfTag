@@ -63,7 +63,7 @@ static void BLE_enterCentral(void);
 static void BLE_waitOnDevice(void);
 static uint8_t BLE_BuildPacket(const char *pString);
 static bool BLE_validatePacket(uint8_t queueEntryIndex);
-static void BLE_SendPacket(const char *pString, uint32_t packetLength);
+static void BLE_SendPacket(uint32_t packetLength);
 void BLE_issueResetCommand(void);
 static void BLE_handleReceiveFlag(void);
 static bool BLE_searchForKeyword(uint8_t * keyword, uint8_t queueEntryIndex);
@@ -224,7 +224,7 @@ uint8_t BLE_BuildPacket(const char *pString)
 	return (sizeof(PacketHeader) + dataLength + sizeof(dataCRC));
 }
 
-static void BLE_SendPacket(const char *pString, uint32_t packetLength)
+static void BLE_SendPacket(uint32_t packetLength)
 {
 	BLE_Send("SND ",4);
 	BLE_Send(sBLE.txBuffer.dataBuffer,packetLength);
@@ -279,8 +279,7 @@ static void BLE_handleReceiveFlag(void)
 				break; //don't go on to try and give app task the received data
 			}
 		#endif
-			uint32_t testing = strlen((const char *)sBLE.rxQueue.entry[queueEntry].data)-8;
-			Util_copyMemory(&sBLE.rxQueue.entry[queueEntry].data[4], sBLE.rxPacket.dataBuffer, strlen((const char *)sBLE.rxQueue.entry[queueEntry].data)-6); //-8 for RCV=\r\n
+			Util_copyMemory(&sBLE.rxQueue.entry[queueEntry].data[4], sBLE.rxPacket.dataBuffer, strlen((const char *)sBLE.rxQueue.entry[queueEntry].data)-6); //-6 for RCV=\r\n
 			if(BLE_validatePacket(queueEntry))
 			{
 				osMessageQueuePut(receivedMessageQ_id,&sBLE.rxPacket.pkt.data,NULL,1000); //send received message to app thread
@@ -324,11 +323,10 @@ void BLE_SendCommand(const char *pString) //this will be called from the app_tas
 	{
 		//send packet
 		//when ack is received, state will change
-		
 		for(uint8_t retries=0; retries < COMMS_MAX_RETRIES; retries++)
 		{
 			sBLE.BLE_currentCommsState = SENDING_PACKET;
-			BLE_SendPacket(pString, packetLength);
+			BLE_SendPacket(packetLength);
 			sBLE.BLE_currentCommsState = AWAITING_ACK;
 			flags = osEventFlagsWait(BLE_Flags,BLE_ACK_RECEIVED,osFlagsWaitAll,3000); //suspend app thread execution until ack is received
 			if(flags & BLE_ACK_RECEIVED)
@@ -343,5 +341,5 @@ void BLE_SendCommand(const char *pString) //this will be called from the app_tas
 void BLE_SendAck(void)
 {
 	uint8_t packetLength = BLE_BuildPacket("ACK");
-	BLE_SendPacket("ACK", packetLength);
+	BLE_SendPacket(packetLength);
 }

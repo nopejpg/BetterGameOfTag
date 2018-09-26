@@ -4,6 +4,8 @@
 
 extern Q_T queue;
 
+#define MASK(x) (1UL << (x))
+
 void Init_TPM(uint32_t period_us)
 {
 	//turn on clock to TPM 
@@ -11,7 +13,7 @@ void Init_TPM(uint32_t period_us)
 	
 	//set clock source for tpm (PLL output / 2 = 24MHz)
 	SIM->SOPT2 |= (SIM_SOPT2_TPMSRC(1) | SIM_SOPT2_PLLFLLSEL_MASK);
-
+	
 	// disable TPM
 	TPM0->SC = 0;
 	
@@ -38,6 +40,7 @@ void Start_TPM(void) {
 void TPM0_IRQHandler() {
 	//clear pending IRQ
 	NVIC_ClearPendingIRQ(TPM0_IRQn);
+	
 	
 	TPM0->SC |= TPM_SC_TOF_MASK; 
 }
