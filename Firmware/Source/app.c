@@ -6,10 +6,14 @@
 #include "DMA.h"
 //#include "safe_female.h"
 //#include "not_female.h"
-#include "Safe_Audio.h"
-#include "Not_Audio.h"
-#include "Go_Audio.h"
-#include "Stop_Audio.h"
+#ifndef IS_HUB_DEVICE
+	#include "Safe_Audio.h"
+	#include "Not_Audio.h"
+	//#include "Go_Audio.h"
+	//#include "Stop_Audio.h"
+	#include "BadNoise.h"
+	#include "GoodNoise.h"
+#endif //IS_HUB_DEVICE
 #include "LEDs.h"
 #include "string.h"
 
@@ -59,6 +63,9 @@ void Thread_APP_HUB(void *arg)
 	}
 }
 #else
+void playBadNoise(void);
+void playGoodNoise(void);
+
 void Thread_APP_POD(void *arg)
 {
 	while(1)
@@ -92,17 +99,37 @@ void Thread_APP_POD(void *arg)
 			{
 				BLE_SendAck();
 				Control_RGB_LEDs(0,1,0);
-				Play_Recording(Go_Audio,sizeof(Go_Audio)/sizeof(Go_Audio[0]));
-				osEventFlagsWait(DMA_flags,DMA_REC_COMPLETE, osFlagsWaitAll, osWaitForever);
+//				Play_Recording(Go_Audio,sizeof(Go_Audio)/sizeof(Go_Audio[0]));
+//				osEventFlagsWait(DMA_flags,DMA_REC_COMPLETE, osFlagsWaitAll, osWaitForever);
+				playGoodNoise();
 			}
 			else if(strstr((const char *)sAPP.rxMessage.dataBuffer,"STOP") != NULL) //if STOP message
 			{
 				BLE_SendAck();
 				Control_RGB_LEDs(1,0,0);
-				Play_Recording(Stop_Audio,sizeof(Stop_Audio)/sizeof(Stop_Audio[0]));
-				osEventFlagsWait(DMA_flags,DMA_REC_COMPLETE, osFlagsWaitAll, osWaitForever);
+//				Play_Recording(Stop_Audio,sizeof(Stop_Audio)/sizeof(Stop_Audio[0]));
+//				osEventFlagsWait(DMA_flags,DMA_REC_COMPLETE, osFlagsWaitAll, osWaitForever);
+				playBadNoise();
 			}
 		}
+	}
+}
+
+void playBadNoise(void)
+{
+	for(uint16_t i=0;i<143;i++) //each segment is ~0.014s long, so need to play ~143 times to get 2s work of sound
+	{
+		Play_Recording(BadNoise,sizeof(BadNoise)/sizeof(BadNoise[0]));
+		osEventFlagsWait(DMA_flags,DMA_REC_COMPLETE, osFlagsWaitAll, osWaitForever);
+	}
+}
+
+void playGoodNoise(void)
+{
+	for(uint16_t i=0;i<100;i++) //each segment is ~0.02s long, so need to play ~100 times to get 2s work of sound
+	{
+		Play_Recording(GoodNoise,sizeof(GoodNoise)/sizeof(GoodNoise[0]));
+		osEventFlagsWait(DMA_flags,DMA_REC_COMPLETE, osFlagsWaitAll, osWaitForever);
 	}
 }
 #endif
