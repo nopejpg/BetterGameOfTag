@@ -1,4 +1,10 @@
 <resources>
     <string name="app_name">BGOT_mobile</string>
     <string name="action_settings">Settings</string>
+    <string name="ble_uuid">886c6b6b-1974-4506-a569-80fc63642dba</string>
+    <string name="Safe_Service">886c6b6c-1974-4506-a569-80fc63642dba</string>
+    <string name="Read_Safe">886c6b6d-1974-4506-a569-80fc63642dba</string>
+    <string name="UnSafe_Service">886c6b6e-1974-4506-a569-80fc63642dba</string>
+    <string name="Read_UnSafe">886c6b6f-1974-4506-a569-80fc63642dba</string>
+    <string name="parc_uuid">6b6b</string>
 </resources>
