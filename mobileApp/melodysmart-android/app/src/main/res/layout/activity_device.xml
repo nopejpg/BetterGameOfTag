@@ -19,7 +19,8 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
-            app:popupTheme="@style/AppTheme.PopupOverlay" />
+            app:popupTheme="@style/AppTheme.PopupOverlay"
+            android:text="BGOT"/>
 
     </android.support.design.widget.AppBarLayout>
 
@@ -42,26 +43,28 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
-            android:enabled="false"
-            android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp"
+            android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
             android:ems="10"
+            android:enabled="false"
             android:hint="Data to Send"
             android:imeOptions="actionSend"
-            android:inputType="text" />
+            android:inputType="text"
+            android:visibility="gone" />
 
         <EditText
             android:id="@+id/etReceivedData"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/etDataToSend"
-            android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp"
+            android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
             android:ems="10"
             android:enabled="false"
-            android:hint="Received Data" />
+            android:hint="Received Data"
+            android:visibility="gone" />
 
         <Button
             android:id="@+id/remoteCommandsButton"
@@ -69,10 +72,11 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/etReceivedData"
             android:layout_centerHorizontal="true"
-            android:enabled="false"
             android:layout_marginTop="8dp"
+            android:enabled="false"
             android:onClick="openRemoteCommands"
-            android:text="Remote commands" />
+            android:text="Remote commands"
+            android:visibility="gone" />
 
         <Button
             android:id="@+id/i2cButton"
@@ -80,10 +84,11 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/remoteCommandsButton"
             android:layout_centerHorizontal="true"
+            android:layout_marginTop="8dp"
             android:enabled="false"
             android:onClick="openI2C"
-            android:layout_marginTop="8dp"
-            android:text="I2C Control" />
+            android:text="I2C Control"
+            android:visibility="gone" />
 
         <Button
             android:id="@+id/otaButton"
@@ -91,33 +96,79 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/i2cButton"
             android:layout_centerHorizontal="true"
-            android:onClick="openUpgradeFw"
             android:layout_marginTop="8dp"
             android:enabled="false"
-            android:text="Firmware Upgrade" />
+            android:onClick="openUpgradeFw"
+            android:text="Firmware Upgrade"
+            android:visibility="gone" />
 
         <Button
-            android:text="Advanced Data"
+            android:id="@+id/advancedDataButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/advancedDataButton"
+            android:layout_alignEnd="@+id/otaButton"
+            android:layout_alignStart="@+id/otaButton"
             android:layout_below="@+id/otaButton"
+            android:layout_marginTop="8dp"
             android:enabled="false"
             android:onClick="openAdvancedData"
-            android:layout_marginTop="8dp"
-            android:layout_alignStart="@+id/otaButton"
-            android:layout_alignEnd="@+id/otaButton" />
+            android:text="Advanced Data"
+            android:visibility="gone" />
 
         <Button
-            android:text="Wi-Fi Configuration"
+            android:id="@+id/wifiConfigButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/wifiConfigButton"
-            android:layout_below="@id/advancedDataButton"
-            android:onClick="openWifiConfiguration"
-            android:layout_marginTop="8dp"
+            android:layout_alignEnd="@+id/otaButton"
             android:layout_alignStart="@+id/otaButton"
-            android:layout_alignEnd="@+id/otaButton" />
+            android:layout_below="@id/advancedDataButton"
+            android:layout_marginTop="8dp"
+            android:onClick="openWifiConfiguration"
+            android:text="Wi-Fi Configuration"
+            android:visibility="gone" />
+
+        <Button
+            android:id="@+id/buttonStart"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/buttonGame1"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="-172dp"
+            android:text="Start Game" />
+
+        <Button
+            android:id="@+id/buttonGame1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="172dp"
+            android:text="Pod1: Safe | Pod2: Unsafe" />
+
+        <Button
+            android:id="@+id/buttonGame2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/buttonExit"
+            android:layout_centerHorizontal="true"
+            android:text="Pod1: Unsafe | Pod2: Safe" />
+
+        <Button
+            android:id="@+id/buttonExit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="168dp"
+            android:text="Exit Game" />
+
+        <TextView
+            android:id="@+id/status"
+            android:layout_width="98dp"
+            android:layout_height="42dp"
+            android:layout_below="@+id/buttonExit"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="-168dp"/>
 
     </RelativeLayout>
 
