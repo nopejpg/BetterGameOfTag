@@ -118,7 +118,9 @@ public class DeviceActivity extends BleActivity implements View.OnClickListener,
         buffer[CRCStartIndex] = (char) Integer.parseInt(CRCString.substring(6,8),16);
         buffer[CRCStartIndex + 1] = (char) Integer.parseInt(CRCString.substring(4,6),16);
 
-        return String.valueOf(buffer);
+        int packetLength = CRCStartIndex + 2;
+
+        return String.valueOf(buffer).substring(0,packetLength);
     }
 
     public static int createCRC(String data, int length) {
@@ -206,7 +208,7 @@ public class DeviceActivity extends BleActivity implements View.OnClickListener,
 //        String bleAddr = "20:FA:BB:04:9E:7B";
 
         try {
-            device.getDataService().send(bleMessage.getBytes());
+            device.getDataService().send(bleMessage.getBytes("ISO-8859-1"));
         } catch (Exception e) {
             Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
             mText.setText("Message Failure");
