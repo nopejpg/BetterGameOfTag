@@ -18,6 +18,8 @@ extern osEventFlagsId_t APP_Request_Flags;
 #define APP_CONNECT_TO_PHONE (1UL << 4)
 #define APP_CHANGE_POD_STATES (1UL << 5)
 #define APP_SEND_ACK (1UL << 6)
+#define APP_ENTER_CENTRAL_MODE (1UL << 7)
+#define APP_ENTER_PERIPHERAL_MODE (1UL << 8)
 
 #ifdef IS_HUB_DEVICE
 void Thread_APP_HUB(void * arg);

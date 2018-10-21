@@ -83,11 +83,15 @@ static void App_playAutomaticTag(void);
 static void App_playRLGL(void);
 static void App_connectToPod(uint32_t Pod_ID);
 
+static void App_enterCentralMode(void);
+static void App_enterPeripheralMode(void);
+
 void Thread_APP_HUB(void *arg)
 {
 	APP_Request_Flags = osEventFlagsNew(NULL);
 	uint32_t flags = osThreadFlagsWait(BLE_INIT_AND_CONNECTED,osFlagsWaitAll,osWaitForever); //ensure BLE module is set up before attempting to send commands to it
 	
+	#ifndef PERIPHERAL_WORKAROUND
 	HubState = SEARCHING_FOR_PHONE_ADDRESS;
 	App_findPhoneAddress();
 	Control_RGB_LEDs(1,0,0); //debug LEDs
@@ -96,6 +100,8 @@ void Thread_APP_HUB(void *arg)
 	App_waitForPods(); //on power up, make sure all pods are online before proceeding
 	
 	App_connectToPhone();
+	#endif
+	
 	HubState = HUB_READY;
 	
 	while(1)
@@ -107,7 +113,10 @@ void Thread_APP_HUB(void *arg)
 			osEventFlagsSet(BLE_Flags,BLE_RECEIVED_MESSAGE_TRANSFERRED); //let BLE module know that we are done with it's data, and that it is free to clear it
 			if(strstr((const char *)sAPP.rxMessage.dataBuffer,"MAN_TAG") != NULL) //if we are commanded to play manual tag
 			{
-				App_SendAck();
+				#ifndef PERIPHERAL_WORKAROUND
+				//App_SendAck();
+				#endif
+				
 				HubState = MANUAL_TAG;
 			}
 			else if(strstr((const char *)sAPP.rxMessage.dataBuffer,"AUTO_TAG") != NULL) //if we are commanded to play automatic tag
@@ -199,7 +208,9 @@ static void App_playManualTag(void)
 			osEventFlagsSet(BLE_Flags,BLE_RECEIVED_MESSAGE_TRANSFERRED); //let BLE module know that we are done with it's data, and that it is free to clear it
 			if(sAPP.rxMessage.dataBuffer[0] == '%') //check if this is a command
 			{
+				#ifndef PERIPHERAL_WORKAROUND
 				App_SendAck();
+				#endif
 				/*
 				An example command to change states looks like this: %SUS
 				3 positions after the %: one for each pod.
@@ -225,11 +236,27 @@ static void App_playManualTag(void)
 			}
 			else if(strstr((const char *)sAPP.rxMessage.dataBuffer,"EXIT_GAME") != NULL)
 			{
+				#ifndef PERIPHERAL_WORKAROUND
 				App_SendAck();
+				#endif
 				HubState = HUB_READY;
 			}
 		}
 	}
+}
+
+void App_enterCentralMode(void)
+{
+	osEventFlagsSet(APP_Request_Flags,APP_ENTER_CENTRAL_MODE); //set what request we are making of the BLE
+	osEventFlagsSet(BLE_Flags,APP_THREAD_REQESTING_ACTION); //Let BLE thread know that we have a request for it
+	osEventFlagsWait(APP_Request_Flags,APP_REQUEST_COMPLETE,NULL,osWaitForever); //wait until BLE is done processing request
+}
+
+void App_enterPeripheralMode(void)
+{
+	osEventFlagsSet(APP_Request_Flags,APP_ENTER_PERIPHERAL_MODE); //set what request we are making of the BLE
+	osEventFlagsSet(BLE_Flags,APP_THREAD_REQESTING_ACTION); //Let BLE thread know that we have a request for it
+	osEventFlagsWait(APP_Request_Flags,APP_REQUEST_COMPLETE,NULL,osWaitForever); //wait until BLE is done processing request
 }
 
 #else

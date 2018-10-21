@@ -97,6 +97,7 @@ static void BLE_SendAck(void);
 static void BLE_waitOnDevice(void);
 
 #ifdef IS_HUB_DEVICE
+static void BLE_restoreFactorySettings(void);
 static void BLE_enterCentral(void);
 static bool BLE_connectToDevice(const char *pBTAddress);
 static void BLE_connectToPod(void);
@@ -105,6 +106,7 @@ static void BLE_waitForPods(void);
 static void BLE_connectToPhone(void);
 static void BLE_changePodStates(void);
 static void BLE_disconnectFromDevice(void);
+static void BLE_enterPeripheral(void);
 #endif //IS_HUB_DEVICE
 
 
@@ -115,7 +117,11 @@ void BLE_init(void)
 	BLE_Flags = osEventFlagsNew(NULL);
   UART0_init(9600,&BLE_handleUARTCB);
 #ifdef IS_HUB_DEVICE
+	#ifndef PERIPHERAL_WORKAROUND
 	BLE_enterCentral();
+	#else
+	BLE_restoreFactorySettings(); //starts up as peripheral, so no need to do that manually
+	#endif //PERIPHERAL_WORKAROUND
 #else
 	
 #endif
@@ -169,6 +175,14 @@ void Thread_BLE(void *arg)
 					if(appRequestEventFlags & APP_SEND_ACK)
 					{
 						BLE_SendAck();
+					}
+					if(appRequestEventFlags & APP_ENTER_CENTRAL_MODE)
+					{
+						BLE_enterCentral();
+					}
+					if(appRequestEventFlags & APP_ENTER_PERIPHERAL_MODE)
+					{
+						BLE_enterPeripheral();
 					}
 					osEventFlagsSet(APP_Request_Flags,APP_REQUEST_COMPLETE); //tell APP thread we are done processing its request
 				}
@@ -275,7 +289,6 @@ static void BLE_SendPacket(uint32_t packetLength)
 	BLE_Send((uint8_t *)"SND ",4);
 	BLE_Send(sBLE.txBuffer.dataBuffer,packetLength);
 	BLE_Send((uint8_t *)"\r",1);
-	//Util_fillMemory(sBLE.txBuffer.dataBuffer,packetLength,'\0'); //if we clear TX here, retries dont work
 }
 
 static bool BLE_validatePacket(uint8_t queueEntryIndex)
@@ -313,10 +326,6 @@ static void BLE_handleReceiveFlag(void)
 		else
 		{
 			sBLE.message_count++;
-			if(sBLE.message_count > 10)
-			{
-				asm("nop"); //we need to increase the amount of entries in the queue
-			}
 		}
 	}
 
@@ -430,10 +439,9 @@ static void BLE_waitOnDevice(void)
 }
 
 #ifdef IS_HUB_DEVICE
-static void BLE_enterCentral(void)
+static void BLE_restoreFactorySettings(void)
 {
 	int32_t result;
-	//first get device back to factory settings
 	do
 	{
 		result = BLE_stdCommand((uint8_t *)"rtr");
@@ -443,8 +451,11 @@ static void BLE_enterCentral(void)
 		result = BLE_stdCommand((uint8_t *)"wrt");
 	}while(result != SUCCESS);
 	BLE_issueResetCommand();
-	
-	//go into central mode
+}
+
+static void BLE_enterCentral(void)
+{
+	int32_t result;
 	do
 	{
 		result = BLE_stdCommand((uint8_t *)"set ACON=off"); //dont automatically connect
@@ -568,6 +579,10 @@ static void BLE_changePodStates(void)
 	bool connectionResult;
 	if(sBLE.deviceConnected)
 		BLE_disconnectFromDevice();
+	#ifdef PERIPHERAL_WORKAROUND
+	BLE_enterCentral();
+	#endif //PERIPHERAL_WORKAROUND
+	
 	if(podInfoList.Pod1_Current_State != requestedPodStates[0])
 	{
 		podInfoList.Pod1_Current_State = requestedPodStates[0];
@@ -607,7 +622,11 @@ static void BLE_changePodStates(void)
 //			BLE_SendCommand("UNSAFE");
 //		BLE_disconnectFromDevice();
 //	}
+	#ifndef PERIPHERAL_WORKAROUND
 	BLE_connectToPhone();
+	#else
+	BLE_enterPeripheral();
+	#endif
 	osEventFlagsClear(APP_Request_Flags,APP_CHANGE_POD_STATES); //clear APP_CONNECT_TO_POD flag
 }
 
@@ -615,6 +634,21 @@ static void BLE_disconnectFromDevice(void)
 {
 	BLE_stdCommand((uint8_t *)"DCN");
 	sBLE.deviceConnected = false;
+}
+
+static void BLE_enterPeripheral(void)
+{
+	int32_t result;
+	//first get device back to factory settings
+	do
+	{
+		result = BLE_stdCommand((uint8_t *)"rtr");
+	}while(result != SUCCESS);
+	do
+	{
+		result = BLE_stdCommand((uint8_t *)"wrt");
+	}while(result != SUCCESS);
+	BLE_issueResetCommand();
 }
 
 
