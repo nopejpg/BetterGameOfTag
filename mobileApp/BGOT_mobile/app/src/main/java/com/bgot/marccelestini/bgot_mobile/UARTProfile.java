@@ -28,6 +28,7 @@ public class UARTProfile {
     public static UUID msService1Characteristic6 = UUID.fromString("818ae306-9c5b-448d-b51a-7add6a5d314d");
     public static UUID msService2Characteristic = UUID.fromString("9bc5d610-c57b-11e3-9c1a-0800200c9a66");
 
+
 //    public static UUID clientCharacteristic = UUID.fromString("0x2902");
 
     public static String getStateDescription(int state) {
