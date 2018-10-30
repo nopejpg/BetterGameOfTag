@@ -67,14 +67,18 @@ public class ScanActivity extends AppCompatActivity implements View.OnClickListe
     //UUIDs "They're also in the strings.xml. I'm having a hard time using R.strings  command... So they're hardcoded" **now theyre in UARTProfile.java
     private BluetoothGattServer mGattServer;
     private BluetoothManager mBluetoothManager;
+    boolean advertising;
+    boolean gattInitialized = false;
 
 
     //create pages
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        BluetoothAdapter.getDefaultAdapter().setName("BGOT");
         super.onCreate(savedInstanceState);
         setContentView(layout.activity_scan);
         mText = findViewById(id.text);
+        advertising = false;
         mAdvertiseButton = findViewById(id.advertise_btn);
         mAdvertiseButton.setOnClickListener(this);
     }
@@ -83,7 +87,12 @@ public class ScanActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View v) {
         if (v.getId() == id.advertise_btn) {
-            advertise();
+            if (advertising == false) {
+                advertise();
+            } else {
+                Log.d("BLE", "Already advertising");
+            }
+
         }
     }
     //Initalize server by setting up UART  server
@@ -189,6 +198,8 @@ public class ScanActivity extends AppCompatActivity implements View.OnClickListe
         msService2.addCharacteristic(msService2Char2);
         msService2.addCharacteristic(msService2Char3);
         mGattServer.addService(msService2);
+
+        gattInitialized = true;
     }
 
     //advertise set-up; however, we need to remove the button at somepoint and add this whole section to onCreate!
@@ -206,15 +217,16 @@ public class ScanActivity extends AppCompatActivity implements View.OnClickListe
         //ParcelUuid pUuid = new ParcelUuid(UARTProfile.bleId);
         ParcelUuid pUuid = new ParcelUuid(UARTProfile.msService1);
         //create data for advertise packet
+
         AdvertiseData advertisingData = new AdvertiseData.Builder()
-                .setIncludeDeviceName(false)
+                .setIncludeDeviceName(true)
                 .setIncludeTxPowerLevel(true)
                 .addServiceUuid(pUuid)
                 .build();
 
         //create data for packet in response to being scanned
         AdvertiseData ScanResponseData = new AdvertiseData.Builder()
-                .setIncludeDeviceName(false)
+                .setIncludeDeviceName(true)
                 .setIncludeTxPowerLevel(true)
                 .addServiceUuid(pUuid)
                 .build();
@@ -225,16 +237,18 @@ public class ScanActivity extends AppCompatActivity implements View.OnClickListe
             public void onStartSuccess(AdvertiseSettings settingsInEffect) {
                 super.onStartSuccess(settingsInEffect);
                 Log.d("BLE", "Advertising onStartSuccess");
+                advertising = true;
             }
 
             @Override
             public void onStartFailure(int errorCode) {
                 Log.e("BLE", "Advertising onStartFailure: " + errorCode);
                 super.onStartFailure(errorCode);
+                advertising = false;
             }
         };
         //Gattserver call back to make account for connection changes and requests!
-        BluetoothGattServerCallback callback = new BluetoothGattServerCallback() {
+        BluetoothGattServerCallback gattServerCallback = new BluetoothGattServerCallback() {
             @Override
             public void onConnectionStateChange(BluetoothDevice device, int status, int newState) {
                 super.onConnectionStateChange(device, status, newState);
@@ -281,8 +295,10 @@ public class ScanActivity extends AppCompatActivity implements View.OnClickListe
         };
         //after setting up data packets for advertisement, set gat
         mBluetoothManager = (BluetoothManager) getSystemService(BLUETOOTH_SERVICE);
-        mGattServer = mBluetoothManager.openGattServer(this, callback);
-        initServer();
+        mGattServer = mBluetoothManager.openGattServer(this, gattServerCallback);
+        if (gattInitialized == false) {
+            initServer();
+        }
         //begin to advertise
         advertiser.startAdvertising(advertisementSettings, advertisingData, ScanResponseData, advertisingCallback);
     }
