@@ -28,8 +28,29 @@ public class UARTProfile {
     public static UUID msService1Characteristic6 = UUID.fromString("818ae306-9c5b-448d-b51a-7add6a5d314d");
     public static UUID msService2Characteristic = UUID.fromString("9bc5d610-c57b-11e3-9c1a-0800200c9a66");
 
-
-//    public static UUID clientCharacteristic = UUID.fromString("0x2902");
+    //melody smart generic UUIDs
+    public static UUID genericAttribute = convertFromInteger(0x1801);
+    public static UUID serviceChanged = convertFromInteger(0x2A05);
+    public static UUID genericAccess = convertFromInteger(0x1800);
+    public static UUID deviceName = convertFromInteger(0x2A00);
+    public static UUID appearance = convertFromInteger(0x2A01);
+    public static UUID peripheralPreferredConnecectionParameters = convertFromInteger(0x2A04);
+    public static UUID deviceInformation = convertFromInteger(0x180A);
+    public static UUID serialNumberString = convertFromInteger(0x2A25);
+    public static UUID modelNumberString = convertFromInteger(0x2A24);
+    public static UUID systemID = convertFromInteger(0x2A23);
+    public static UUID hardwareRevisionString = convertFromInteger(0x2A27);
+    public static UUID firmwareRevisionString = convertFromInteger(0x2A26);
+    public static UUID softwareRevisionString = convertFromInteger(0x2A28);
+    public static UUID manufacturerNameString = convertFromInteger(0x2A29);
+    public static UUID pnpID = convertFromInteger(0x2A50);
+    public static UUID batteryService = convertFromInteger(0x180F);
+    public static UUID batteryLevel = convertFromInteger(0x2A19);
+    public static UUID linkLoss = convertFromInteger(0x1803);
+    public static UUID alertLevel = convertFromInteger(0x2A06);
+    public static UUID immediateAlert = convertFromInteger(0x1802);
+    public static UUID txPower = convertFromInteger(0x1804);
+    public static UUID txPowerLevel = convertFromInteger(0x2A07);
 
     public static String getStateDescription(int state) {
         switch (state) {
@@ -54,6 +75,13 @@ public class UARTProfile {
             default:
                 return "Unknown Status "+status;
         }
+    }
+
+    public static UUID convertFromInteger(int i) {
+        final long MSB = 0x0000000000001000L;
+        final long LSB = 0x800000805f9b34fbL;
+        long value = i & 0xFFFFFFFF;
+        return new UUID(MSB | (value << 32), LSB);
     }
 
 

@@ -199,6 +199,141 @@ public class ScanActivity extends AppCompatActivity implements View.OnClickListe
         msService2.addCharacteristic(msService2Char3);
         mGattServer.addService(msService2);
 
+        BluetoothGattService genericAttributeService = new BluetoothGattService(UARTProfile.genericAttribute,
+                BluetoothGattService.SERVICE_TYPE_PRIMARY);
+
+        BluetoothGattCharacteristic serviceChanged = new BluetoothGattCharacteristic(UARTProfile.serviceChanged,
+                BluetoothGattCharacteristic.PROPERTY_INDICATE |
+        BluetoothGattCharacteristic.PROPERTY_READ,
+                BluetoothGattCharacteristic.PERMISSION_READ |
+        BluetoothGattCharacteristic.PERMISSION_WRITE);
+
+        genericAttributeService.addCharacteristic(serviceChanged);
+        mGattServer.addService(genericAttributeService);
+
+        BluetoothGattService genericAccessService = new BluetoothGattService(UARTProfile.genericAccess,
+                BluetoothGattService.SERVICE_TYPE_PRIMARY);
+
+        BluetoothGattCharacteristic deviceName = new BluetoothGattCharacteristic(UARTProfile.deviceName,
+                BluetoothGattCharacteristic.PROPERTY_READ |
+        BluetoothGattCharacteristic.PROPERTY_WRITE,
+                BluetoothGattCharacteristic.PERMISSION_READ |
+        BluetoothGattCharacteristic.PERMISSION_WRITE);
+
+        BluetoothGattCharacteristic appearance = new BluetoothGattCharacteristic(UARTProfile.appearance,
+                BluetoothGattCharacteristic.PROPERTY_READ,
+                BluetoothGattCharacteristic.PERMISSION_READ |
+        BluetoothGattCharacteristic.PERMISSION_WRITE);
+
+        BluetoothGattCharacteristic peripheralPreferredConnectionParameters = new BluetoothGattCharacteristic(UARTProfile.peripheralPreferredConnecectionParameters,
+                BluetoothGattCharacteristic.PROPERTY_READ,
+                BluetoothGattCharacteristic.PERMISSION_READ |
+        BluetoothGattCharacteristic.PERMISSION_WRITE);
+
+        genericAccessService.addCharacteristic(deviceName);
+        genericAccessService.addCharacteristic(appearance);
+        genericAccessService.addCharacteristic(peripheralPreferredConnectionParameters);
+        mGattServer.addService(genericAccessService);
+
+        BluetoothGattService deviceInformationService = new BluetoothGattService(UARTProfile.deviceInformation,
+                BluetoothGattService.SERVICE_TYPE_PRIMARY);
+
+        BluetoothGattCharacteristic serialNumberString = new BluetoothGattCharacteristic(UARTProfile.serialNumberString,
+                BluetoothGattCharacteristic.PROPERTY_READ,
+                BluetoothGattCharacteristic.PERMISSION_READ |
+        BluetoothGattCharacteristic.PERMISSION_WRITE);
+
+        BluetoothGattCharacteristic modelNumberString = new BluetoothGattCharacteristic(UARTProfile.modelNumberString,
+                BluetoothGattCharacteristic.PROPERTY_READ,
+                BluetoothGattCharacteristic.PERMISSION_READ |
+        BluetoothGattCharacteristic.PERMISSION_WRITE);
+
+        BluetoothGattCharacteristic systemID = new BluetoothGattCharacteristic(UARTProfile.systemID,
+                BluetoothGattCharacteristic.PROPERTY_READ,
+                BluetoothGattCharacteristic.PERMISSION_READ |
+        BluetoothGattCharacteristic.PERMISSION_WRITE);
+
+        BluetoothGattCharacteristic hardwareRevisionString = new BluetoothGattCharacteristic(UARTProfile.hardwareRevisionString,
+                BluetoothGattCharacteristic.PROPERTY_READ,
+                BluetoothGattCharacteristic.PERMISSION_READ |
+        BluetoothGattCharacteristic.PERMISSION_WRITE);
+
+        BluetoothGattCharacteristic firmwareRevisionString = new BluetoothGattCharacteristic(UARTProfile.firmwareRevisionString,
+                BluetoothGattCharacteristic.PROPERTY_READ,
+                BluetoothGattCharacteristic.PERMISSION_READ |
+        BluetoothGattCharacteristic.PERMISSION_WRITE);
+
+        BluetoothGattCharacteristic softwareRevisionString = new BluetoothGattCharacteristic(UARTProfile.softwareRevisionString,
+                BluetoothGattCharacteristic.PROPERTY_READ,
+                BluetoothGattCharacteristic.PERMISSION_READ |
+        BluetoothGattCharacteristic.PERMISSION_WRITE);
+
+        BluetoothGattCharacteristic manufacturerNameString = new BluetoothGattCharacteristic(UARTProfile.manufacturerNameString,
+                BluetoothGattCharacteristic.PROPERTY_READ,
+                BluetoothGattCharacteristic.PERMISSION_READ |
+        BluetoothGattCharacteristic.PERMISSION_WRITE);
+
+        BluetoothGattCharacteristic pnpID = new BluetoothGattCharacteristic(UARTProfile.pnpID,
+                BluetoothGattCharacteristic.PROPERTY_READ,
+                BluetoothGattCharacteristic.PERMISSION_READ |
+        BluetoothGattCharacteristic.PERMISSION_WRITE);
+
+        deviceInformationService.addCharacteristic(serialNumberString);
+        deviceInformationService.addCharacteristic(modelNumberString);
+        deviceInformationService.addCharacteristic(systemID);
+        deviceInformationService.addCharacteristic(hardwareRevisionString);
+        deviceInformationService.addCharacteristic(firmwareRevisionString);
+        deviceInformationService.addCharacteristic(softwareRevisionString);
+        deviceInformationService.addCharacteristic(manufacturerNameString);
+        deviceInformationService.addCharacteristic(pnpID);
+        mGattServer.addService(deviceInformationService);
+
+        BluetoothGattService batteryService = new BluetoothGattService(UARTProfile.batteryService,
+                BluetoothGattService.SERVICE_TYPE_PRIMARY);
+
+        BluetoothGattCharacteristic batteryLevel = new BluetoothGattCharacteristic(UARTProfile.batteryLevel,
+                BluetoothGattCharacteristic.PROPERTY_READ |
+        BluetoothGattCharacteristic.PROPERTY_NOTIFY,
+                BluetoothGattCharacteristic.PERMISSION_READ |
+        BluetoothGattCharacteristic.PERMISSION_WRITE);
+
+        batteryService.addCharacteristic(batteryLevel);
+        mGattServer.addService(batteryService);
+
+        BluetoothGattService linkLossService = new BluetoothGattService(UARTProfile.linkLoss,
+                BluetoothGattService.SERVICE_TYPE_PRIMARY);
+
+        BluetoothGattCharacteristic alertLevel1 = new BluetoothGattCharacteristic(UARTProfile.alertLevel,
+                BluetoothGattCharacteristic.PROPERTY_READ |
+        BluetoothGattCharacteristic.PROPERTY_WRITE,
+                BluetoothGattCharacteristic.PERMISSION_READ |
+        BluetoothGattCharacteristic.PERMISSION_WRITE);
+
+        linkLossService.addCharacteristic(alertLevel1);
+        mGattServer.addService(linkLossService);
+
+        BluetoothGattService immediateAlertService = new BluetoothGattService(UARTProfile.immediateAlert,
+                BluetoothGattService.SERVICE_TYPE_PRIMARY);
+
+        BluetoothGattCharacteristic alertLevel2 = new BluetoothGattCharacteristic(UARTProfile.alertLevel,
+                BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE,
+                BluetoothGattCharacteristic.PERMISSION_READ |
+        BluetoothGattCharacteristic.PERMISSION_WRITE);
+
+        immediateAlertService.addCharacteristic(alertLevel2);
+        mGattServer.addService(immediateAlertService);
+
+        BluetoothGattService txPowerService = new BluetoothGattService(UARTProfile.txPower,
+                BluetoothGattService.SERVICE_TYPE_PRIMARY);
+
+        BluetoothGattCharacteristic txPowerLevel = new BluetoothGattCharacteristic(UARTProfile.txPowerLevel,
+                BluetoothGattCharacteristic.PROPERTY_READ,
+                BluetoothGattCharacteristic.PERMISSION_READ |
+        BluetoothGattCharacteristic.PERMISSION_WRITE);
+
+        txPowerService.addCharacteristic(txPowerLevel);
+        mGattServer.addService(txPowerService);
+
         gattInitialized = true;
     }
 
@@ -220,14 +355,14 @@ public class ScanActivity extends AppCompatActivity implements View.OnClickListe
 
         AdvertiseData advertisingData = new AdvertiseData.Builder()
                 .setIncludeDeviceName(true)
-                .setIncludeTxPowerLevel(true)
+                .setIncludeTxPowerLevel(false)
                 .addServiceUuid(pUuid)
                 .build();
 
         //create data for packet in response to being scanned
         AdvertiseData ScanResponseData = new AdvertiseData.Builder()
                 .setIncludeDeviceName(true)
-                .setIncludeTxPowerLevel(true)
+                .setIncludeTxPowerLevel(false)
                 .addServiceUuid(pUuid)
                 .build();
 
