@@ -74,7 +74,10 @@ public class ScanActivity extends AppCompatActivity implements View.OnClickListe
     //create pages
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        BluetoothAdapter.getDefaultAdapter().setName("BGOT");
+        if (BluetoothAdapter.getDefaultAdapter() != null) {
+            BluetoothAdapter.getDefaultAdapter().setName("BGOT");
+        }
+
         super.onCreate(savedInstanceState);
         setContentView(layout.activity_scan);
         mText = findViewById(id.text);

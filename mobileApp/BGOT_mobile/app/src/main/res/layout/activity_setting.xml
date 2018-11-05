@@ -17,7 +17,7 @@
         android:text="Settings"
         android:textColor="@drawable/ic_info_black_24dp"
         android:textSize="30sp"
-        app:layout_constraintBottom_toTopOf="@+id/divider"
+        app:layout_constraintBottom_toTopOf="@+id/settingsTopDivider"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
@@ -25,12 +25,17 @@
         app:layout_constraintVertical_bias="0.0" />
 
     <View
-        android:id="@+id/divider"
+        android:id="@+id/settingsTopDivider"
         android:layout_width="585dp"
         android:layout_height="1dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="172dp"
         android:background="?android:attr/listDivider"
-        tools:layout_editor_absoluteX="8dp"
-        tools:layout_editor_absoluteY="172dp" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <android.support.v7.widget.RecyclerView
         android:layout_width="515dp"
@@ -39,22 +44,27 @@
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/divider2"
+        app:layout_constraintBottom_toTopOf="@+id/settingsBottomDivider"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.495"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/divider" />
+        app:layout_constraintTop_toTopOf="@+id/settingsTopDivider" />
 
     <View
-        android:id="@+id/divider2"
+        android:id="@+id/settingsBottomDivider"
         android:layout_width="585dp"
         android:layout_height="1dp"
+        android:layout_marginBottom="192dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
         android:background="?android:attr/listDivider"
-        tools:layout_editor_absoluteX="8dp"
-        tools:layout_editor_absoluteY="593dp" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <Button
-        android:id="@+id/button4"
+        android:id="@+id/settingsFindPodsButton"
         android:layout_width="249dp"
         android:layout_height="83dp"
         android:layout_marginBottom="8dp"
@@ -68,5 +78,5 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/divider2" />
+        app:layout_constraintTop_toTopOf="@+id/settingsBottomDivider" />
 </android.support.constraint.ConstraintLayout>
