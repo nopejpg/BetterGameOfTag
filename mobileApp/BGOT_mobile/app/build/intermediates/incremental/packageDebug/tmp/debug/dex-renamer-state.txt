@@ -1,4 +1,0 @@
-#Mon Nov 05 12:03:05 EST 2018
-base.0=/Users/marc.celestini/Documents/NCSU/BetterGameOfTag/mobileApp/BGOT_mobile/app/build/intermediates/transforms/dexMerger/debug/0
-path.0=classes.dex
-renamed.0=classes.dex

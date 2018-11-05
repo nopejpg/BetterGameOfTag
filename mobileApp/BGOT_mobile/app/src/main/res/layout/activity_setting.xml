@@ -15,7 +15,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="80dp"
         android:text="Settings"
-        android:textColor="@drawable/ic_info_black_24dp"
+        android:textColor="@android:color/black"
         android:textSize="30sp"
         app:layout_constraintBottom_toTopOf="@+id/settingsTopDivider"
         app:layout_constraintEnd_toEndOf="parent"

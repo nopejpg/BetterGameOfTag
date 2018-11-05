@@ -58,12 +58,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import android.content.Intent;
+
 import static com.bgot.marccelestini.bgot_mobile.R.*;
 
 public class ScanActivity extends AppCompatActivity implements View.OnClickListener {
     //variables for xml to edit
     private TextView mText;
     private Button mAdvertiseButton;
+    private Button advertiseSkipButton;
     //UUIDs "They're also in the strings.xml. I'm having a hard time using R.strings  command... So they're hardcoded" **now theyre in UARTProfile.java
     private BluetoothGattServer mGattServer;
     private BluetoothManager mBluetoothManager;
@@ -74,16 +77,22 @@ public class ScanActivity extends AppCompatActivity implements View.OnClickListe
     //create pages
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        if (BluetoothAdapter.getDefaultAdapter() != null) {
-            BluetoothAdapter.getDefaultAdapter().setName("BGOT");
-        }
-
+        BluetoothAdapter.getDefaultAdapter().setName("BGOT");
         super.onCreate(savedInstanceState);
         setContentView(layout.activity_scan);
         mText = findViewById(id.text);
         advertising = false;
         mAdvertiseButton = findViewById(id.advertise_btn);
         mAdvertiseButton.setOnClickListener(this);
+
+        advertiseSkipButton = findViewById(id.advertiseSkipButton);
+        advertiseSkipButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent mainMenuIntent = new Intent(v.getContext(), MainMenuActivity.class);
+                startActivity(mainMenuIntent);
+            }
+        });
     }
 
     //when the button is clicked, begin advertise

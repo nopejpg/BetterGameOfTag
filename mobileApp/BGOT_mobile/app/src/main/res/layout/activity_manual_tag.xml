@@ -118,7 +118,7 @@
         app:layout_constraintTop_toBottomOf="@+id/manualTagTopDivider" />
 
     <Switch
-        android:id="@+id/manualTagPod1Switch"
+        android:id="@+id/manualTagPod3Switch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="80dp"
@@ -128,13 +128,15 @@
         android:textOff="Unsafe"
         android:textOn="Safe"
         android:textSize="30sp"
+        android:trackTint="@android:color/holo_green_light"
+        android:thumbTint="@android:color/holo_green_dark"
         app:layout_constraintBottom_toTopOf="@+id/manualTagBottomDivider"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.582"
         app:layout_constraintStart_toEndOf="@+id/manualTagPod3Label" />
 
     <Switch
-        android:id="@+id/manualTagPod1Switch3"
+        android:id="@+id/manualTagPod2Switch"
         android:layout_width="wrap_content"
         android:layout_height="41dp"
         android:layout_marginBottom="68dp"
@@ -145,15 +147,17 @@
         android:textOff="Unsafe"
         android:textOn="Safe"
         android:textSize="30sp"
-        app:layout_constraintBottom_toTopOf="@+id/manualTagPod1Switch"
+        android:trackTint="@android:color/holo_green_light"
+        android:thumbTint="@android:color/holo_green_dark"
+        app:layout_constraintBottom_toTopOf="@+id/manualTagPod3Switch"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.582"
         app:layout_constraintStart_toEndOf="@+id/manualTagPod2Label"
-        app:layout_constraintTop_toBottomOf="@+id/manualTagPod1Switch2"
+        app:layout_constraintTop_toBottomOf="@+id/manualTagPod1Switch"
         app:layout_constraintVertical_bias="1.0" />
 
     <Switch
-        android:id="@+id/manualTagPod1Switch2"
+        android:id="@+id/manualTagPod1Switch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
@@ -163,6 +167,8 @@
         android:textOff="Unsafe"
         android:textOn="Safe"
         android:textSize="30sp"
+        android:trackTint="@android:color/holo_green_light"
+        android:thumbTint="@android:color/holo_green_dark"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.116"
         app:layout_constraintStart_toEndOf="@+id/manualTagPod1Label"

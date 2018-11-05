@@ -80,7 +80,7 @@
         android:text="Main Menu"
         android:textAlignment="center"
         android:textAllCaps="true"
-        android:textColor="@drawable/ic_info_black_24dp"
+        android:textColor="@android:color/black"
         android:textSize="30sp"
         app:layout_constraintBottom_toTopOf="@+id/autoTagButton"
         app:layout_constraintEnd_toEndOf="parent"
