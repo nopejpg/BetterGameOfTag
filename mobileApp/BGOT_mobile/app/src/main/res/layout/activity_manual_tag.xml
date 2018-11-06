@@ -39,9 +39,11 @@
         android:layout_width="585dp"
         android:layout_height="1dp"
         android:layout_marginBottom="212dp"
+        android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:background="?android:attr/listDivider"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
     <Button
@@ -49,14 +51,11 @@
         android:layout_width="157dp"
         android:layout_height="98dp"
         android:layout_marginBottom="8dp"
-        android:layout_marginEnd="76dp"
-        android:layout_marginStart="8dp"
+        android:layout_marginStart="112dp"
         android:layout_marginTop="76dp"
         android:text="Play"
         android:textSize="30sp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/manualTagQuitButton"
-        app:layout_constraintHorizontal_bias="0.781"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/manualTagBottomDivider"
         app:layout_constraintVertical_bias="0.0" />
@@ -79,30 +78,27 @@
         android:id="@+id/manualTagPod3Label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="80dp"
         android:layout_marginStart="128dp"
+        android:layout_marginTop="68dp"
         android:text="Pod 3"
         android:textAllCaps="false"
         android:textColor="@android:color/black"
         android:textSize="30sp"
-        app:layout_constraintBottom_toTopOf="@+id/manualTagBottomDivider"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/manualTagPod2Label" />
 
     <TextView
         android:id="@+id/manualTagPod2Label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
         android:layout_marginStart="128dp"
         android:layout_marginTop="60dp"
         android:text="Pod 2"
         android:textAllCaps="false"
         android:textColor="@android:color/black"
         android:textSize="30sp"
-        app:layout_constraintBottom_toTopOf="@+id/manualTagPod3Label"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/manualTagPod1Label"
-        app:layout_constraintVertical_bias="0.032" />
+        app:layout_constraintTop_toBottomOf="@+id/manualTagPod1Label" />
 
     <TextView
         android:id="@+id/manualTagPod1Label"
@@ -121,57 +117,45 @@
         android:id="@+id/manualTagPod3Switch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="80dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
+        android:layout_marginEnd="132dp"
+        android:layout_marginTop="60dp"
         android:showText="true"
         android:textOff="Unsafe"
         android:textOn="Safe"
         android:textSize="30sp"
-        android:trackTint="@android:color/holo_green_light"
-        android:thumbTint="@android:color/holo_green_dark"
-        app:layout_constraintBottom_toTopOf="@+id/manualTagBottomDivider"
+        android:thumbTint="@android:color/holo_blue_dark"
+        android:trackTint="@android:color/holo_blue_light"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.582"
-        app:layout_constraintStart_toEndOf="@+id/manualTagPod3Label" />
+        app:layout_constraintTop_toBottomOf="@+id/manualTagPod2Switch" />
 
     <Switch
         android:id="@+id/manualTagPod2Switch"
         android:layout_width="wrap_content"
         android:layout_height="41dp"
-        android:layout_marginBottom="68dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginEnd="132dp"
+        android:layout_marginTop="52dp"
         android:showText="true"
         android:textOff="Unsafe"
         android:textOn="Safe"
         android:textSize="30sp"
-        android:trackTint="@android:color/holo_green_light"
-        android:thumbTint="@android:color/holo_green_dark"
-        app:layout_constraintBottom_toTopOf="@+id/manualTagPod3Switch"
+        android:thumbTint="@android:color/holo_blue_dark"
+        android:trackTint="@android:color/holo_blue_light"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.582"
-        app:layout_constraintStart_toEndOf="@+id/manualTagPod2Label"
-        app:layout_constraintTop_toBottomOf="@+id/manualTagPod1Switch"
-        app:layout_constraintVertical_bias="1.0" />
+        app:layout_constraintTop_toBottomOf="@+id/manualTagPod1Switch" />
 
     <Switch
         android:id="@+id/manualTagPod1Switch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="152dp"
+        android:layout_marginEnd="132dp"
         android:layout_marginTop="88dp"
         android:showText="true"
         android:textOff="Unsafe"
         android:textOn="Safe"
         android:textSize="30sp"
-        android:trackTint="@android:color/holo_green_light"
-        android:thumbTint="@android:color/holo_green_dark"
+        android:thumbTint="@android:color/holo_blue_dark"
+        android:trackTint="@android:color/holo_blue_light"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.116"
-        app:layout_constraintStart_toEndOf="@+id/manualTagPod1Label"
         app:layout_constraintTop_toBottomOf="@+id/manualTagTopDivider" />
 
 
