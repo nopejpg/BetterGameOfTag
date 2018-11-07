@@ -1,6 +1,7 @@
 package com.bgot.marccelestini.bgot_mobile;
 
 import android.Manifest;
+import android.app.ListActivity;
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -40,6 +41,8 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.location.Location;
+import android.location.LocationManager;
 
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -67,11 +70,17 @@ public class ScanActivity extends AppCompatActivity implements View.OnClickListe
     private TextView mText;
     private Button mAdvertiseButton;
     private Button advertiseSkipButton;
-    //UUIDs "They're also in the strings.xml. I'm having a hard time using R.strings  command... So they're hardcoded" **now theyre in UARTProfile.java
+    private Button connectButton;
+    //UUIDs "They're also in the strings.xml. 'm having a hard time using R.strings  command... So they're hardcoded" **now theyre in UARTProfile.java
     private BluetoothGattServer mGattServer;
     private BluetoothManager mBluetoothManager;
+    private BluetoothAdapter mBluetoothAdapter;
+    private BluetoothLeScanner btScanner;
     boolean advertising;
     boolean gattInitialized = false;
+
+    private final static int REQUEST_ENABLE_BT = 1;
+    private static final int PERMISSION_REQUEST_COARSE_LOCATION = 1;
 
 
     //create pages
@@ -93,6 +102,14 @@ public class ScanActivity extends AppCompatActivity implements View.OnClickListe
                 startActivity(mainMenuIntent);
             }
         });
+
+        connectButton = findViewById(id.connectButton);
+        connectButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                connectAsCentral();
+            }
+        });
     }
 
     //when the button is clicked, begin advertise
@@ -107,6 +124,91 @@ public class ScanActivity extends AppCompatActivity implements View.OnClickListe
 
         }
     }
+
+    private void connectAsCentral() {
+
+        final BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
+        mBluetoothAdapter = bluetoothManager.getAdapter();
+        btScanner = mBluetoothAdapter.getBluetoothLeScanner();
+
+        if (mBluetoothAdapter == null || !mBluetoothAdapter.isEnabled()) {
+            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+        }
+
+        // Make sure we have access coarse location enabled, if not, prompt the user to enable it
+        if (this.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("This app needs location access");
+            builder.setMessage("Please grant location access so this app can detect peripherals.");
+            builder.setPositiveButton(android.R.string.ok, null);
+            builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                @Override
+                public void onDismiss(DialogInterface dialog) {
+                    requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, PERMISSION_REQUEST_COARSE_LOCATION);
+                }
+            });
+            builder.show();
+        }
+
+
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+                btScanner.startScan(leScanCallback);
+            }
+        });
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case PERMISSION_REQUEST_COARSE_LOCATION: {
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    System.out.println("coarse location permission granted");
+                } else {
+                    final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setTitle("Cannot connect without location permission granted");;
+                    builder.setPositiveButton(android.R.string.ok, null);
+                    builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
+
+                        @Override
+                        public void onDismiss(DialogInterface dialog) {
+                        }
+
+                    });
+                    builder.show();
+                }
+                return;
+            }
+        }
+    }
+
+    // Device scan callback.
+    private ScanCallback leScanCallback = new ScanCallback() {
+        @Override
+        public void onScanResult(int callbackType, ScanResult result) {
+            Log.d("BLE Scan", "Name: " +result.getDevice().getName());
+            String deviceAddress = result.getDevice().getAddress();
+
+            if (deviceAddress.equals("20:FA:BB:04:9E:7B")) {
+
+                mBluetoothGatt = result.getDevice().connectGatt(this, true, mGattCallback);
+
+
+                AsyncTask.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        btScanner.stopScan(leScanCallback);
+                    }
+                });
+            }
+        }
+    };
+
+    private Gatt
+
     //Initalize server by setting up UART  server
     private void initServer() {
 //        BluetoothGattService UART_SERVICE = new BluetoothGattService(UARTProfile.bleId,
