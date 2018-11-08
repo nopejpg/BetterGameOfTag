@@ -23,7 +23,8 @@
  *---------------------------------------------------------------------------*/
  
  const osThreadAttr_t Thread_BLE_attr = {
-		.priority = osPriorityAboveNormal
+		.priority = osPriorityAboveNormal,
+		.stack_size = 512,
 	};
  
 int main (void) {

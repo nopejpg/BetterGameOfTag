@@ -15,6 +15,7 @@
 #define BLE_CONNECTED_TO_DEVICE (1U << 6) //used for BLE_connectToDevice()
 #define APP_THREAD_REQESTING_ACTION (1U << 7) //used to tell BLE that the app has a request. Below flags provide specifics
 #define BLE_MELODYSMART_ADDRESS_FOUND (1U << 8) //used to let us know that a potential phone address has been found
+#define BLE_TEMP_STOP_CON_ATTEMPTS (1U <<  9) //used to tell ourselves that we need to run function to momentarily stop connection attempts to hub
 
 /*Flag(s) used to synchronize APP and BLE threads*/
 #define BLE_INIT_AND_CONNECTED (1UL << 0) //tells APP thread that BLE is initialized and ready for use

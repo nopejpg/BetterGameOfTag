@@ -8,6 +8,7 @@ extern osMessageQueueId_t deviceConnectionRequestQ_id;
 extern osMessageQueueId_t requestedPodStatesQ_id;
 extern osEventFlagsId_t DMA_flags;
 extern osEventFlagsId_t APP_Request_Flags;
+extern osTimerId_t APP_AutoTagTimer_id;
 #define DMA_REC_COMPLETE 0x00000001ul
 
 /*Event flags used to tell the BLE class/module what the APP class/module wants it to do*/
@@ -20,6 +21,8 @@ extern osEventFlagsId_t APP_Request_Flags;
 #define APP_SEND_ACK (1UL << 6)
 #define APP_ENTER_CENTRAL_MODE (1UL << 7)
 #define APP_ENTER_PERIPHERAL_MODE (1UL << 8)
+#define APP_AUTO_TAG_TIMER_EXPIRED (1UL << 9)
+#define APP_MESSAGE_PENDING_FROM_BLE (1UL << 10)
 
 #ifdef IS_HUB_DEVICE
 void Thread_APP_HUB(void * arg);

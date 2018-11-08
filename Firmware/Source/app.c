@@ -4,6 +4,7 @@
 #include "app.h"
 #include "BLE.h"
 #include "DMA.h"
+#include <stdlib.h>
 //#include "safe_female.h"
 //#include "not_female.h"
 #ifndef IS_HUB_DEVICE
@@ -39,6 +40,7 @@ static enum
 osThreadId_t tid_APP;
 osEventFlagsId_t DMA_flags;
 osEventFlagsId_t APP_Request_Flags;
+osTimerId_t APP_AutoTagTimer_id;
 osMessageQueueId_t receivedMessageQ_id;
 osMessageQueueId_t deviceConnectionRequestQ_id;
 osMessageQueueId_t requestedPodStatesQ_id;
@@ -85,19 +87,21 @@ static void App_connectToPod(uint32_t Pod_ID);
 
 static void App_enterCentralMode(void);
 static void App_enterPeripheralMode(void);
+static void App_autoTagTimer_Callback(void *arg);
 
 void Thread_APP_HUB(void *arg)
 {
 	APP_Request_Flags = osEventFlagsNew(NULL);
+	APP_AutoTagTimer_id = osTimerNew(App_autoTagTimer_Callback,osTimerOnce,NULL,NULL);
 	uint32_t flags = osThreadFlagsWait(BLE_INIT_AND_CONNECTED,osFlagsWaitAll,osWaitForever); //ensure BLE module is set up before attempting to send commands to it
 	
 	#ifndef PERIPHERAL_WORKAROUND
-	HubState = SEARCHING_FOR_PHONE_ADDRESS;
-	App_findPhoneAddress();
+	//HubState = SEARCHING_FOR_PHONE_ADDRESS;
+	//App_findPhoneAddress();
 	Control_RGB_LEDs(1,0,0); //debug LEDs
 	
 	HubState = PODS_AWAITING_CONNECTION;
-	App_waitForPods(); //on power up, make sure all pods are online before proceeding
+	//App_waitForPods(); //on power up, make sure all pods are online before proceeding
 	
 	App_connectToPhone();
 	#endif
@@ -107,21 +111,26 @@ void Thread_APP_HUB(void *arg)
 	while(1)
 	{
 		Control_RGB_LEDs(0,1,0); //debug LEDs
-		result = osMessageQueueGet(receivedMessageQ_id, &sAPP.rxMessage, NULL, 1000); //wait until command from Phone App is received
+		osEventFlagsWait(APP_Request_Flags, APP_MESSAGE_PENDING_FROM_BLE, osFlagsWaitAll, osWaitForever);
+		uint32_t result = osMessageQueueGet(receivedMessageQ_id, &sAPP.rxMessage, NULL, 1000); //wait until command from Phone App is received
 		if(result == osOK)
 		{
 			osEventFlagsSet(BLE_Flags,BLE_RECEIVED_MESSAGE_TRANSFERRED); //let BLE module know that we are done with it's data, and that it is free to clear it
 			if(strstr((const char *)sAPP.rxMessage.dataBuffer,"MAN_TAG") != NULL) //if we are commanded to play manual tag
 			{
 				#ifndef PERIPHERAL_WORKAROUND
-				//App_SendAck();
+				App_SendAck();
 				#endif
 				
 				HubState = MANUAL_TAG;
 			}
-			else if(strstr((const char *)sAPP.rxMessage.dataBuffer,"AUTO_TAG") != NULL) //if we are commanded to play automatic tag
+			else if(strstr((const char *)sAPP.rxMessage.dataBuffer,"AUTOMATE_TAG") != NULL) //if we are commanded to play automatic tag
 			{
-				//TODO
+				#ifndef PERIPHERAL_WORKAROUND
+				App_SendAck();
+				#endif
+				
+				HubState = AUTO_TAG;
 			}
 			else if(strstr((const char *)sAPP.rxMessage.dataBuffer,"RL_GL") != NULL) //if we are commanded to play red-light/green-light
 			{
@@ -134,7 +143,7 @@ void Thread_APP_HUB(void *arg)
 		}
 		else if(HubState == AUTO_TAG)
 		{
-			
+			App_playAutomaticTag();
 		}
 		else if(HubState == RL_GL)
 		{
@@ -185,7 +194,6 @@ static void App_connectToPhone(void)
 
 static void App_changePodStates(uint8_t * podStateCommands)
 {
-	//osMessageQueuePut(requestedPodStatesQ_id,&podStateCommands,NULL,osWaitForever); //set which pod to connect to
 	osMessageQueuePut(requestedPodStatesQ_id,podStateCommands,NULL,osWaitForever); //set which pod to connect to
 	osEventFlagsSet(APP_Request_Flags,APP_CHANGE_POD_STATES); //set what request we are making of the BLE
 	osEventFlagsSet(BLE_Flags,APP_THREAD_REQESTING_ACTION); //Let BLE thread know that we have a request for it
@@ -202,7 +210,8 @@ static void App_playManualTag(void)
 		uint8_t pod3StateCommand;
 		Control_RGB_LEDs(0,0,1); //debug LEDs
 		
-		result = osMessageQueueGet(receivedMessageQ_id, &sAPP.rxMessage, NULL, 1000); //wait until command from Phone App is received
+		osEventFlagsWait(APP_Request_Flags, APP_MESSAGE_PENDING_FROM_BLE, NULL, 1000);
+		uint32_t result = osMessageQueueGet(receivedMessageQ_id, &sAPP.rxMessage, NULL, 1000); //wait until command from Phone App is received
 		if(result == osOK)
 		{
 			osEventFlagsSet(BLE_Flags,BLE_RECEIVED_MESSAGE_TRANSFERRED); //let BLE module know that we are done with it's data, and that it is free to clear it
@@ -245,6 +254,40 @@ static void App_playManualTag(void)
 	}
 }
 
+static void App_playAutomaticTag(void)
+{
+	while(HubState == AUTO_TAG)
+	{
+		static uint8_t podStateRequest[3];
+		//randomize and change pod states here
+		podStateRequest[0] = (rand() % 2) + 1; //should give value between [1,2]
+		podStateRequest[1] = (rand() % 2) + 1; //should give value between [1,2]
+		podStateRequest[2] = (rand() % 2) + 1; //should give value between [1,2]
+		//start timer here (for ~20 seconds?)
+		osTimerStart(APP_AutoTagTimer_id, 20000);
+		
+		//Control_RGB_LEDs(pod1_State,pod2_State,pod3_State); //stand-in for BLE commands
+		App_changePodStates(podStateRequest);
+		
+		uint32_t result = osEventFlagsWait(APP_Request_Flags, APP_AUTO_TAG_TIMER_EXPIRED|APP_MESSAGE_PENDING_FROM_BLE, NULL, osWaitForever);
+		if(result & APP_MESSAGE_PENDING_FROM_BLE)
+		{
+			uint32_t result = osMessageQueueGet(receivedMessageQ_id, &sAPP.rxMessage, NULL, 1000);
+			if(strstr((const char *)sAPP.rxMessage.dataBuffer,"EXIT_GAME") != NULL)
+			{
+				#ifndef PERIPHERAL_WORKAROUND
+				App_SendAck();
+				#endif
+				HubState = HUB_READY;
+			}
+		}
+		else if(result & APP_AUTO_TAG_TIMER_EXPIRED)
+		{
+			//dont need to do anything. keep looping until EXIT_GAME command
+		}
+	}
+}
+
 void App_enterCentralMode(void)
 {
 	osEventFlagsSet(APP_Request_Flags,APP_ENTER_CENTRAL_MODE); //set what request we are making of the BLE
@@ -259,9 +302,14 @@ void App_enterPeripheralMode(void)
 	osEventFlagsWait(APP_Request_Flags,APP_REQUEST_COMPLETE,NULL,osWaitForever); //wait until BLE is done processing request
 }
 
+void App_autoTagTimer_Callback(void *arg)
+{
+	osEventFlagsSet(APP_Request_Flags,APP_AUTO_TAG_TIMER_EXPIRED);
+}
+
 #else
-void playBadNoise(void);
-void playGoodNoise(void);
+static void playBadNoise(void);
+static void playGoodNoise(void);
 
 void Thread_APP_POD(void *arg)
 {
@@ -338,5 +386,4 @@ static void App_SendAck(void)
 	osEventFlagsSet(BLE_Flags,APP_THREAD_REQESTING_ACTION); //Let BLE thread know that we have a request for it
 	osEventFlagsWait(APP_Request_Flags,APP_REQUEST_COMPLETE,NULL,osWaitForever); //wait until BLE is done processing request
 }
-
 

@@ -20,7 +20,7 @@ void Init_RGB_LEDs(void) {
 	PTD->PDDR |= MASK(BLUE_LED_POS);
 }
 
-void Control_RGB_LEDs(unsigned int red_on, unsigned int green_on, unsigned int blue_on) {
+void Control_RGB_LEDs(uint8_t red_on, uint8_t green_on, uint8_t blue_on) {
 	if (red_on) {
 			PTB->PCOR = MASK(RED_LED_POS);
 	} else {

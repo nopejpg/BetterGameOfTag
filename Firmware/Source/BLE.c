@@ -78,6 +78,7 @@ podInfo podInfoList = {.Pod1_Address = "20FABB049EA5",.Pod2_Address = "20FABB049
 
 static char phoneAddress[12]; //phone address should be a 12 byte hex string
 static char scannedAddress[12];
+static char connectedDeviceAddress[12];
 #endif //IS_HUB_DEVICE
 
 //static BLE_moduleState BLE_stateOfModule;
@@ -95,11 +96,12 @@ static void BLE_handleReceiveFlag(void);
 static void BLE_SendCommand(const char *pString);
 static void BLE_SendAck(void);
 static void BLE_waitOnDevice(void);
-
+static void BLE_enterCentral(void);
+static void BLE_tempStopConAttempts(uint32_t time_ms);
 #ifdef IS_HUB_DEVICE
 static void BLE_restoreFactorySettings(void);
-static void BLE_enterCentral(void);
 static bool BLE_connectToDevice(const char *pBTAddress);
+static bool BLE_isDeviceConnected(void);
 static void BLE_connectToPod(void);
 static void BLE_findPhoneAddress(void);
 static void BLE_waitForPods(void);
@@ -117,13 +119,9 @@ void BLE_init(void)
 	BLE_Flags = osEventFlagsNew(NULL);
   UART0_init(9600,&BLE_handleUARTCB);
 #ifdef IS_HUB_DEVICE
-	#ifndef PERIPHERAL_WORKAROUND
-	BLE_enterCentral();
-	#else
 	BLE_restoreFactorySettings(); //starts up as peripheral, so no need to do that manually
-	#endif //PERIPHERAL_WORKAROUND
 #else
-	
+	BLE_enterCentral();
 #endif
 }
 
@@ -135,14 +133,18 @@ void Thread_BLE(void *arg)
 	requestedPodStatesQ_id = osMessageQueueNew(1,3*sizeof(uint8_t),NULL);
 	while(1)
 	{
-		osThreadFlagsSet(tid_APP,BLE_INIT_AND_CONNECTED); //TESTING
-		uint32_t flagsToWaitFor = (BLE_MESSAGE_RECEIVED | BLE_MESSAGE_READY_FOR_TRANSMIT | APP_THREAD_REQESTING_ACTION);
+		osThreadFlagsSet(tid_APP,BLE_INIT_AND_CONNECTED);
+		uint32_t flagsToWaitFor = (BLE_MESSAGE_RECEIVED | BLE_MESSAGE_READY_FOR_TRANSMIT | APP_THREAD_REQESTING_ACTION | BLE_TEMP_STOP_CON_ATTEMPTS);
 		uint32_t eventFlags = osEventFlagsWait(BLE_Flags,flagsToWaitFor,osFlagsWaitAny,1000);
 		if(eventFlags != 0xFFFFFFFE) //if we didn't time out
 		{
 			if(eventFlags & BLE_MESSAGE_RECEIVED)
 			{
 				BLE_handleReceiveFlag();
+			}
+			if(eventFlags & BLE_TEMP_STOP_CON_ATTEMPTS)
+			{
+				BLE_tempStopConAttempts(3000);
 			}
 			if(eventFlags & APP_THREAD_REQESTING_ACTION)
 			{
@@ -171,11 +173,6 @@ void Thread_BLE(void *arg)
 					{
 						BLE_changePodStates();
 					}
-					#endif //IS_HUB_DEVICE
-					if(appRequestEventFlags & APP_SEND_ACK)
-					{
-						BLE_SendAck();
-					}
 					if(appRequestEventFlags & APP_ENTER_CENTRAL_MODE)
 					{
 						BLE_enterCentral();
@@ -183,6 +180,11 @@ void Thread_BLE(void *arg)
 					if(appRequestEventFlags & APP_ENTER_PERIPHERAL_MODE)
 					{
 						BLE_enterPeripheral();
+					}
+					#endif //IS_HUB_DEVICE
+					if(appRequestEventFlags & APP_SEND_ACK)
+					{
+						BLE_SendAck();
 					}
 					osEventFlagsSet(APP_Request_Flags,APP_REQUEST_COMPLETE); //tell APP thread we are done processing its request
 				}
@@ -345,18 +347,11 @@ static void BLE_handleReceiveFlag(void)
 			Util_copyMemory(&sBLE.rxQueue.entry[queueEntry].data[4], sBLE.rxPacket.dataBuffer, strlen((const char *)sBLE.rxQueue.entry[queueEntry].data)-6); //-6 for RCV=\r\n
 			if(BLE_validatePacket(queueEntry))
 			{
+				osEventFlagsSet(APP_Request_Flags, APP_MESSAGE_PENDING_FROM_BLE);
 				osMessageQueuePut(receivedMessageQ_id,&sBLE.rxPacket.pkt.data,NULL,1000); //send received message to app thread
 				osEventFlagsWait(BLE_Flags,BLE_RECEIVED_MESSAGE_TRANSFERRED,osFlagsWaitAll,3000); //wait until received message has been copied over to app thread variable before deleting.
 				osMessageQueueReset(receivedMessageQ_id); //TESTING. DOES THIS PREVENT REPEAT MESSAGES?
 			}
-		}
-		//else if(BLE_searchForKeyword((uint8_t *)"FTRS",queueEntry)) //a string the BLE sends when it is connected successfully
-		else if(BLE_searchForKeyword((uint8_t *)"DCFG=NOT",queueEntry)) //a string the BLE sends when it is connected successfully
-		{
-			//Change from "waiting to connection" to "connected" state
-			sBLE.BLE_currentCommsState = CONNECTED_IDLE;
-			sBLE.BLE_currentModuleState = RESPONSE_RECEIVED;
-			osEventFlagsSet(BLE_Flags,BLE_CONNECTED_TO_DEVICE); //signals that a requested connection to a device was successfully made
 		}
 		else if(BLE_searchForKeyword((uint8_t *)"OK",queueEntry))
 		{
@@ -373,6 +368,11 @@ static void BLE_handleReceiveFlag(void)
 			//Change from "waiting on response" to "response received" state
 			sBLE.BLE_currentModuleState = RESPONSE_RECEIVED;
 		}
+		else if(BLE_searchForKeyword((uint8_t *)"DCN=RMT",queueEntry))
+		{
+			//signal that we should not try to connect for another x seconds
+			osEventFlagsSet(BLE_Flags,BLE_TEMP_STOP_CON_ATTEMPTS);
+		}
 		#ifdef IS_HUB_DEVICE
 		else if(BLE_searchForKeyword((uint8_t *)"SCN=",queueEntry)) //send scan results over to app thread so that it can find the phone's bluetooth address
 		{
@@ -388,12 +388,20 @@ static void BLE_handleReceiveFlag(void)
 				osEventFlagsSet(BLE_Flags,BLE_MELODYSMART_ADDRESS_FOUND);
 			}
 		}
-		#endif //IS_HUB_DEVICE
-		else if(BLE_searchForKeyword((uint8_t *)"STS=",queueEntry))
+		else if(BLE_searchForKeyword((uint8_t *)"STS=P CON",queueEntry)) //we are successfully connected
 		{
+			//Change from "waiting to connection" to "connected" state
+			sBLE.BLE_currentCommsState = CONNECTED_IDLE;
+			sBLE.BLE_currentModuleState = RESPONSE_RECEIVED;
+			Util_copyMemory(&sBLE.rxQueue.entry[queueEntry].data[10],(uint8_t *)connectedDeviceAddress,12);
+			osEventFlagsSet(BLE_Flags,BLE_CONNECTED_TO_DEVICE); //signals that a requested connection to a device was successfully made
+			
+			
 			//Change from "waiting on response" to "response received" state
 			sBLE.BLE_currentModuleState = RESPONSE_RECEIVED;
 		}
+		#endif //IS_HUB_DEVICE
+		
 		//once message has been processed, or if it was not something we care about, clear out that entry
 		Util_fillMemory(sBLE.rxQueue.entry[queueEntry].data, MESSAGE_SIZE, '\0');
 	}
@@ -438,6 +446,41 @@ static void BLE_waitOnDevice(void)
 	BLE_handleReceiveFlag();
 }
 
+static void BLE_enterCentral(void)
+{
+	int32_t result;
+	do
+	{
+		result = BLE_stdCommand((uint8_t *)"set cent=on");
+	}while(result != SUCCESS);
+	do
+	{
+		result = BLE_stdCommand((uint8_t *)"set acon=on");
+	}while(result != SUCCESS);
+	do
+	{
+		//result = BLE_stdCommand((uint8_t *)"set scnp=000F4240 00002BF2"); //set scan interval to 1000000us (0x000F4240) to prevent UART from being overwhelmed
+		result = BLE_stdCommand((uint8_t *)"set scnp=0003D090 00002BF2"); //set scan interval to 250000us (0x0003D090) to prevent UART from being overwhelmed
+	}while(result != SUCCESS);
+	do
+	{
+		result = BLE_stdCommand((uint8_t *)"set addr=20FABB049EBC"); //set device to only connect to hub
+	}while(result != SUCCESS);
+	do
+	{
+		result = BLE_stdCommand((uint8_t *)"wrt");
+	}while(result != SUCCESS);
+	BLE_issueResetCommand();
+}
+
+static void BLE_tempStopConAttempts(uint32_t time_ms)
+{
+	enum opResult resp = BLE_stdCommand("set acon=off");
+	osDelay(time_ms);
+	resp = BLE_stdCommand("set acon=on");
+	asm("nop");
+}
+
 #ifdef IS_HUB_DEVICE
 static void BLE_restoreFactorySettings(void)
 {
@@ -453,42 +496,58 @@ static void BLE_restoreFactorySettings(void)
 	BLE_issueResetCommand();
 }
 
-static void BLE_enterCentral(void)
-{
-	int32_t result;
-	do
-	{
-		result = BLE_stdCommand((uint8_t *)"set ACON=off"); //dont automatically connect
-	}while(result != SUCCESS);
-	do
-	{
-		result = BLE_stdCommand((uint8_t *)"set cent=on");
-	}while(result != SUCCESS);
-	do
-	{
-		result = BLE_stdCommand((uint8_t *)"set scnp=000F4240 00002BF2"); //set scan interval to 1000000us (0x000F4240) to prevent UART from being overwhelmed
-	}while(result != SUCCESS);
-	do
-	{
-		result = BLE_stdCommand((uint8_t *)"wrt");
-	}while(result != SUCCESS);
-	BLE_issueResetCommand();
-}
-
 static bool BLE_connectToDevice(const char *pBTAddress)
 {
-	sBLE.BLE_currentModuleState = SENDING_COMMAND;
-	BLE_Send((uint8_t *)"CON ",4);
-	BLE_Send((uint8_t *)pBTAddress,BLE_ADDRESS_LENGTH);
-	BLE_Send((uint8_t *)" 0\r",3);
-	sBLE.BLE_currentModuleState = AWAITING_RESPONSE;
+	uint8_t connection_attempts = 0;
+	BLE_isDeviceConnected();
+	if(strncmp(connectedDeviceAddress,pBTAddress,12) != 0) //if we are not already connected to the device we want, then disconnect
+	{
+		do
+		{
+			if(connection_attempts > 10)
+				return false;
+			connection_attempts++;
+			BLE_disconnectFromDevice();
+			BLE_isDeviceConnected();
+		}while(strncmp(connectedDeviceAddress,pBTAddress,12) != 0); //while we are connected to the wrong device...
+		return true;
+	}
+	else //if we ARE already connected to the correct device
+	{
+		return true;
+	}
+	
+	
+//	if(sBLE.deviceConnected)
+//		BLE_disconnectFromDevice();
+//	bool result = false;
+//	uint8_t connection_attempts = 0;
+//	do
+//	{
+//		connection_attempts++;
+//		sBLE.BLE_currentModuleState = SENDING_COMMAND;
+//		BLE_Send((uint8_t *)"CON ",4);
+//		BLE_Send((uint8_t *)pBTAddress,BLE_ADDRESS_LENGTH);
+//		BLE_Send((uint8_t *)" 0\r",3);
+//		sBLE.BLE_currentModuleState = AWAITING_RESPONSE;
+//		result = BLE_isDeviceConnected();
+//		if(connection_attempts > 10) //this is just a simple way to handle the case where a pod dies. We want to give up attempting to connect to it eventually.
+//			break;
+//	}while(result == false);
+//	
+//	return result; //true if we successfully connected, and false if we had to break out of the loop
+}
 
+static bool BLE_isDeviceConnected(void)
+{
+	sBLE.BLE_currentModuleState = SENDING_COMMAND;
+	BLE_Send((uint8_t *)"STS\r",4);
+	sBLE.BLE_currentModuleState = AWAITING_RESPONSE;
 	osDelay(500); //Give time for all messages to come in so we can process them all at once
 	uint32_t events = osEventFlagsWait(BLE_Flags,BLE_MESSAGE_RECEIVED,osFlagsWaitAll,osWaitForever);
 	BLE_handleReceiveFlag();
 	
 	events = osEventFlagsGet(BLE_Flags);
-	
 	if((events&BLE_CONNECTED_TO_DEVICE)&&(events != 0xFFFFFFFE))
 	{
 		osEventFlagsClear(BLE_Flags, BLE_CONNECTED_TO_DEVICE); //need to clear flag manually since we did not "wait" on it
@@ -563,41 +622,66 @@ static void BLE_waitForPods(void)
 
 static void BLE_connectToPhone(void)
 {
-	bool connectionEstablished;
+	bool connectionEstablished = false;
 	do
 	{
-		connectionEstablished = BLE_connectToDevice(phoneAddress);
-	}while(connectionEstablished == false);
+		BLE_disconnectFromDevice();
+		do
+		{
+			connectionEstablished = BLE_isDeviceConnected();
+		}while(strncmp(connectedDeviceAddress,"000000000000",12)==0); //if nothing is connected yet, keep checking
+	//}while((!connectionEstablished)||(strncmp(connectedDeviceAddress,podInfoList.Pod1_Address,12) == 0)||(strncmp(connectedDeviceAddress,podInfoList.Pod2_Address,12) == 0)||(strncmp(connectedDeviceAddress,podInfoList.Pod3_Address,12) == 0)); //while we are connected to the wrong device...
+	}while((!connectionEstablished)||(strncmp(connectedDeviceAddress,podInfoList.Pod2_Address,12) == 0)||(strncmp(connectedDeviceAddress,podInfoList.Pod3_Address,12) == 0)); //while we are connected to the wrong device...
 	osEventFlagsClear(APP_Request_Flags,APP_CONNECT_TO_PHONE); //clear APP_CONNECT_TO_POD flag
 	osMessageQueuePut(deviceConnectionRequestQ_id,&connectionEstablished,NULL,1000); //send result back to APP thread
+	
+	
+//	bool connectionEstablished=false;
+//	do
+//	{
+//		connectionEstablished = BLE_connectToDevice(phoneAddress);
+//	}while(connectionEstablished == false);
+//	osEventFlagsClear(APP_Request_Flags,APP_CONNECT_TO_PHONE); //clear APP_CONNECT_TO_POD flag
+//	osMessageQueuePut(deviceConnectionRequestQ_id,&connectionEstablished,NULL,1000); //send result back to APP thread
+	
+	
 }
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
 
 static void BLE_changePodStates(void)
 {
 	uint8_t requestedPodStates[3];
 	uint32_t testingResult = osMessageQueueGet(requestedPodStatesQ_id,&requestedPodStates,NULL,1000);
+	bool changeWasNeeded = false; //used to determine if we need to switch in/out of central mode (if workaround is enabled), or if we need to disconnect/connect to phone
 	bool connectionResult;
-	if(sBLE.deviceConnected)
-		BLE_disconnectFromDevice();
-	#ifdef PERIPHERAL_WORKAROUND
-	BLE_enterCentral();
-	#endif //PERIPHERAL_WORKAROUND
+
 	
-	if(podInfoList.Pod1_Current_State != requestedPodStates[0])
-	{
-		podInfoList.Pod1_Current_State = requestedPodStates[0];
-		do
-		{
-			connectionResult = BLE_connectToDevice(podInfoList.Pod1_Address);
-		}while(connectionResult == false);
-		if(requestedPodStates[0]==SAFE)
-			BLE_SendCommand("SAFE");
-		else if(requestedPodStates[0]==UNSAFE)
-			BLE_SendCommand("UNSAFE");
-		BLE_disconnectFromDevice();
-	}
+//	if(podInfoList.Pod1_Current_State != requestedPodStates[0])
+//	{
+//		changeWasNeeded = true;
+//		podInfoList.Pod1_Current_State = requestedPodStates[0];
+//		do
+//		{
+//			connectionResult = BLE_connectToDevice(podInfoList.Pod1_Address);
+//		}while(connectionResult == false);
+//		if(requestedPodStates[0]==SAFE)
+//			BLE_SendCommand("SAFE");
+//		else if(requestedPodStates[0]==UNSAFE)
+//			BLE_SendCommand("UNSAFE");
+//		//BLE_disconnectFromDevice();
+//	}
 	if(podInfoList.Pod2_Current_State != requestedPodStates[1])
 	{
+		changeWasNeeded = true;
 		podInfoList.Pod2_Current_State = requestedPodStates[1];
 		do
 		{
@@ -607,10 +691,11 @@ static void BLE_changePodStates(void)
 			BLE_SendCommand("SAFE");
 		else if(requestedPodStates[1]==UNSAFE)
 			BLE_SendCommand("UNSAFE");
-		BLE_disconnectFromDevice();
+		//BLE_disconnectFromDevice();
 	}
 //	if(podInfoList.Pod3_Current_State != requestedPodStates[2])
 //	{
+//		changeWasNeeded = true;
 //		podInfoList.Pod3_Current_State = requestedPodStates[2];
 //		do
 //		{
@@ -620,19 +705,20 @@ static void BLE_changePodStates(void)
 //			BLE_SendCommand("SAFE");
 //		else if(requestedPodStates[2]==UNSAFE)
 //			BLE_SendCommand("UNSAFE");
-//		BLE_disconnectFromDevice();
+//		//BLE_disconnectFromDevice();
 //	}
-	#ifndef PERIPHERAL_WORKAROUND
-	BLE_connectToPhone();
-	#else
-	BLE_enterPeripheral();
-	#endif
+	if(changeWasNeeded == true)
+		BLE_connectToPhone();
+
 	osEventFlagsClear(APP_Request_Flags,APP_CHANGE_POD_STATES); //clear APP_CONNECT_TO_POD flag
 }
 
 static void BLE_disconnectFromDevice(void)
 {
-	BLE_stdCommand((uint8_t *)"DCN");
+	Util_fillMemory((uint8_t *)connectedDeviceAddress,12,'0'); //clear connectedDeviceAddress to denote that we are not connected to anything
+	BLE_stdCommand((uint8_t *)"DCN"); //first dcn makes pod disable automatic reconnection (but will reconnect before this takes effect)
+	//do we need a delay here?
+	BLE_stdCommand((uint8_t *)"DCN"); //second disconnect causes the lasting disconnection
 	sBLE.deviceConnected = false;
 }
 

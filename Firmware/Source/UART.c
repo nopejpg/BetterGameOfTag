@@ -121,7 +121,6 @@ extern void UART_receive(void)
 }
 
 
-
 void UART0_IRQHandler(void)
 {
 	volatile uint8_t dummy_read;
