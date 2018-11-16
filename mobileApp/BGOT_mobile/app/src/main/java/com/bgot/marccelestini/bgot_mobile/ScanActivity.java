@@ -154,10 +154,10 @@ public class ScanActivity extends AppCompatActivity {
             return;
         }
 
-         if (!hubIsReady) {
-             testOutputText.setText("Hub not ready to receive data");
-             return;
-         }
+//         if (!hubIsReady) {
+//             testOutputText.setText("Hub not ready to receive data");
+//             return;
+//         }
 
         String message = UARTProfile.createPacket(mes);
 
@@ -302,9 +302,9 @@ public class ScanActivity extends AppCompatActivity {
                 Log.e("ERR", "Unable to convert message bytes to string");
             }
             Log.d("DBG","Received message: " + messageString);
-            if (messageString.contains("SEND_OK")) {
-                hubIsReady = true;
-            }
+//            if (messageString.contains("SEND_OK")) {
+//                hubIsReady = true;
+//            }
         }
 
         @Override
@@ -337,7 +337,7 @@ public class ScanActivity extends AppCompatActivity {
             commsReady = gatt.setCharacteristicNotification(commsCharacteristic, true);
             Log.d("BLE","Communications service is ready");
             //testOutputText.setText("Communication service ready");
-            hubIsReady = false;
+//            hubIsReady = false;
         }
     };
 
@@ -347,7 +347,7 @@ public class ScanActivity extends AppCompatActivity {
             mBluetoothGatt.disconnect();
             mBluetoothGatt.close();
         }
-        hubIsReady = false;
+//        hubIsReady = false;
         commsReady = false;
 
     }
