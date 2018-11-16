@@ -24,11 +24,13 @@ typedef enum
 typedef void (*ISRCallback)(UARTOperationEnum op);
 
 extern void UART0_init(uint32_t baud_rate, ISRCallback callback);
-extern void UART_send(uint8_t *pData, uint32_t length);
+extern void UART1_init(uint32_t baud_rate, ISRCallback callback);
+extern void UART_send(uint8_t *pData, uint32_t length, uint8_t UART_num);
 extern void UART_receive(void);
 extern void UART_resetRxBuffer(void);
 //extern void UART_stop_receiving(void);
-extern uint8_t UART_getPacket(uint8_t *pBuffer);
+extern uint8_t UART_getPacket_fromPhone(uint8_t *pBuffer);
+extern uint8_t UART_getPacket_fromPods(uint8_t *pBuffer);
 
 void UART_Cancel(void);
 
