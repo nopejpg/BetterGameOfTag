@@ -5,8 +5,6 @@
 #include "BLE.h"
 #include "DMA.h"
 #include <stdlib.h>
-//#include "safe_female.h"
-//#include "not_female.h"
 #ifndef IS_HUB_DEVICE
 	#include "Safe_Audio.h"
 	#include "Not_Audio.h"
@@ -93,8 +91,8 @@ void Thread_APP_HUB(void *arg)
 	Control_RGB_LEDs(1,0,0); //debug LEDs
 	
 	HubState = PODS_AWAITING_CONNECTION;
-	//App_waitForPods WORKS FINE. COMMENTED OUT SO BLE CAN BE USED TO TEST OTHER THINGS
-	//App_waitForPods(); //on power up, make sure all pods are online before proceeding
+
+	App_waitForPods(); //on power up, make sure all pods are online before proceeding
 	
 	HubState = HUB_READY;
 	

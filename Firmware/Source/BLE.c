@@ -83,29 +83,29 @@ static char connectedDeviceAddress[12];
 #endif //IS_HUB_DEVICE
 
 osThreadId_t tid_BLE;
-
-static void BLE_handleUARTCB_forPhone(UARTOperationEnum op);
-static void BLE_handleUARTCB_forPods(UARTOperationEnum op);											
+static void BLE_handleUARTCB_forPhone(UARTOperationEnum op);											
 static void BLE_Send(uint8_t *pData, uint32_t length, uint8_t UART_num);
 static bool BLE_searchForKeyword(uint8_t * keyword, uint8_t queueEntryIndex, Queue * rxQueue);
 static void BLE_issueResetCommand(uint8_t BLE_module);
 static uint8_t BLE_BuildPacket(const char *pString);
 static void BLE_SendPacket(uint32_t packetLength, uint8_t BLE_module);
 static bool BLE_validatePacket(void);
-static void BLE_handleReceiveFlag_fromPhone(void);
-static void BLE_handleReceiveFlag_fromPods(void);											
-static void BLE_SendCommand(const char *pString);
+static void BLE_handleReceiveFlag_fromPhone(void); //used by pod to handle messages from hub	
 static void BLE_SendAck(void);
 static void BLE_waitOnDevice(uint8_t BLE_module);
-static void BLE_initBLE_forPhone(void);
-static void BLE_initBLE_forPods(void);
+static void BLE_initBLE_forPhone(void); //used by pod to init its BLE
+
 //static void BLE_tempStopConAttempts(uint32_t time_ms); //dont need this function anymore
 #ifdef IS_HUB_DEVICE
+static void BLE_handleUARTCB_forPods(UARTOperationEnum op);
 static bool BLE_connectToDevice(const char *pBTAddress);
 static bool BLE_isDeviceConnected(void);
 static void BLE_waitForPods(void);
 static void BLE_changePodStates(void);
 static void BLE_disconnectFromDevice(void);
+static void BLE_initBLE_forPods(void);
+static void BLE_handleReceiveFlag_fromPods(void);	
+static void BLE_SendCommand(const char *pString);
 #endif //IS_HUB_DEVICE
 
 
@@ -117,9 +117,10 @@ void BLE_init(void)
 	sBLE.podConnected = false;
 	BLE_Flags = osEventFlagsNew(NULL);
   UART0_init(9600,&BLE_handleUARTCB_forPhone);
+	#ifdef IS_HUB_DEVICE
 	UART1_init(9600,&BLE_handleUARTCB_forPods);
-	
 	BLE_initBLE_forPods();
+	#endif //IS_HUB_DEVICE
 	BLE_initBLE_forPhone();
 }
 
@@ -140,13 +141,15 @@ void Thread_BLE(void *arg)
 			{
 				BLE_handleReceiveFlag_fromPhone();
 			}
+			#ifdef IS_HUB_DEVICE
 			if(eventFlags & BLE_MESSAGE_RECEIVED_FROM_PODS)
 			{
 				BLE_handleReceiveFlag_fromPods();
 			}
+			#endif //IS_HUB_DEVICE
 			if(eventFlags & APP_THREAD_REQESTING_ACTION)
 			{
-				flagsToWaitFor = (APP_CONNECT_TO_POD);
+				//flagsToWaitFor = (APP_CONNECT_TO_POD);
 				uint32_t appRequestEventFlags = osEventFlagsGet(APP_Request_Flags);
 				if(appRequestEventFlags != 0xFFFFFFFE) //if we didn't time out
 				{
@@ -199,6 +202,7 @@ static void BLE_handleUARTCB_forPhone(UARTOperationEnum op)
   }
 }
 
+#ifdef IS_HUB_DEVICE
 static void BLE_handleUARTCB_forPods(UARTOperationEnum op)
 {
   switch(op)
@@ -217,6 +221,7 @@ static void BLE_handleUARTCB_forPods(UARTOperationEnum op)
     break;
   }
 }
+#endif //IS_HUB_DEVICE
 
 static void BLE_Send(uint8_t *pData, uint32_t length, uint8_t UART_num)
 {
@@ -240,11 +245,13 @@ enum opResult BLE_stdCommand(uint8_t *command, uint8_t UART_num)
 		osEventFlagsWait(BLE_Flags,BLE_MESSAGE_RECEIVED_FROM_PHONE,osFlagsWaitAll,osWaitForever);
 		BLE_handleReceiveFlag_fromPhone();
 	}
+	#ifdef IS_HUB_DEVICE
 	else
 	{
 		osEventFlagsWait(BLE_Flags,BLE_MESSAGE_RECEIVED_FROM_PODS,osFlagsWaitAll,osWaitForever);
 		BLE_handleReceiveFlag_fromPods();
 	}
+	#endif //IS_HUB_DEVICE
 	
 	if((sBLE.BLE_currentModuleState_forPhone == RESPONSE_RECEIVED)&&(UART_num == SEND_TO_PHONE))
 	{
@@ -397,6 +404,8 @@ static void BLE_handleReceiveFlag_fromPhone(void)
 			//Change from "waiting on response" to "response received" state
 			sBLE.BLE_currentModuleState_forPhone = RESPONSE_RECEIVED;
 		}
+		
+		#ifdef IS_HUB_DEVICE
 		else if(BLE_searchForKeyword((uint8_t *)"STS=P CON", queueEntry, &sBLE.rxQueue_fromPhone)) //we are successfully connected
 		{
 			//Change from "waiting to connection" to "connected" state
@@ -409,6 +418,7 @@ static void BLE_handleReceiveFlag_fromPhone(void)
 			//Change from "waiting on response" to "response received" state
 			sBLE.BLE_currentModuleState_forPhone = RESPONSE_RECEIVED;
 		}
+		#endif //IS_HUB_DEVICE
 		
 		//once message has been processed, or if it was not something we care about, clear out that entry
 		Util_fillMemory(sBLE.rxQueue_fromPhone.entry[queueEntry].data, MESSAGE_SIZE, '\0');
@@ -508,6 +518,7 @@ static void BLE_handleReceiveFlag_fromPods(void)
 	sBLE.message_count_fromPods = 0; //all messages have been processed. Can begin adding to queue again
 }
 
+#ifdef IS_HUB_DEVICE
 static void BLE_SendCommand(const char *pString)
 {
 	//this function will use BLE_SendPacket, mixed with retries, to help ensure faithful communication to other bluetooth device.
@@ -532,6 +543,7 @@ static void BLE_SendCommand(const char *pString)
 		}
 	}
 }
+#endif //IS_HUB_DEVICE
 
 static void BLE_SendAck(void)
 {
@@ -553,6 +565,20 @@ static void BLE_waitOnDevice(uint8_t BLE_module)
 		BLE_handleReceiveFlag_fromPods();
 	}
 	
+}
+
+static void BLE_initBLE_forPhone(void)
+{
+	int32_t result;
+	do
+	{
+		result = BLE_stdCommand((uint8_t *)"rtr", PHONE_BLE);
+	}while(result != SUCCESS);
+	do
+	{
+		result = BLE_stdCommand((uint8_t *)"wrt", PHONE_BLE);
+	}while(result != SUCCESS);
+	BLE_issueResetCommand(PHONE_BLE);
 }
 
 #ifdef IS_HUB_DEVICE
@@ -691,19 +717,7 @@ static void BLE_initBLE_forPods(void)
 	BLE_issueResetCommand(PODS_BLE);
 }
 
-static void BLE_initBLE_forPhone(void)
-{
-	int32_t result;
-	do
-	{
-		result = BLE_stdCommand((uint8_t *)"rtr", PHONE_BLE);
-	}while(result != SUCCESS);
-	do
-	{
-		result = BLE_stdCommand((uint8_t *)"wrt", PHONE_BLE);
-	}while(result != SUCCESS);
-	BLE_issueResetCommand(PHONE_BLE);
-}
+
 
 #endif //IS_HUB_DEVICE
 
