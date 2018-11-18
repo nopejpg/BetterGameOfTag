@@ -49,7 +49,6 @@ int main (void) {
 #endif
 	
 	tid_BLE = osThreadNew(Thread_BLE, NULL, &Thread_BLE_attr);    // Create thread
-	//receivedMessageQ_id = osMessageQueueNew(1,sizeof(uint8_t*),NULL);
 	
 	
 	DMA_flags = osEventFlagsNew(NULL);

@@ -32,6 +32,8 @@ static enum
 }HubState;
 
 
+static bool currentPodStatuses[3];
+
 #endif //IS_HUB_DEVICE
 
 
@@ -43,6 +45,7 @@ osTimerId_t APP_AutoTagWarningTimer_id;
 osMessageQueueId_t receivedMessageQ_id;
 osMessageQueueId_t deviceConnectionRequestQ_id;
 osMessageQueueId_t requestedPodStatesQ_id;
+osMessageQueueId_t podStateRequestResultsQ_id;
 osStatus_t result;
 
 
@@ -152,6 +155,7 @@ static void App_changePodStates(uint8_t * podStateCommands)
 	osEventFlagsSet(APP_Request_Flags,APP_CHANGE_POD_STATES); //set what request we are making of the BLE
 	osEventFlagsSet(BLE_Flags,APP_THREAD_REQESTING_ACTION); //Let BLE thread know that we have a request for it
 	osEventFlagsWait(APP_Request_Flags,APP_REQUEST_COMPLETE,NULL,osWaitForever); //wait until BLE is done processing request
+	osMessageQueueGet(podStateRequestResultsQ_id, &currentPodStatuses,NULL,osWaitForever); //retrieve the most recent connection statuses of the pods
 }
 
 static void App_playManualTag(void)
@@ -228,8 +232,8 @@ static void App_playAutomaticTag(void)
 	static uint8_t podStateRequest[3];
 	static uint8_t warningPodStateRequest[3];
 	podStateRequest[0] = (rand() % 2) + 1; //should give value between [1,2]
-	podStateRequest[1] = (rand() % 2) + 1; //should give value between [1,2]
-	podStateRequest[2] = (rand() % 2) + 1; //should give value between [1,2]
+	podStateRequest[1] = (rand() % 2) + 1;
+	podStateRequest[2] = (rand() % 2) + 1;
 	App_changePodStates(podStateRequest); //change pod states
 	osTimerStart(APP_AutoTagChangeTimer_id, 20000);
 	osTimerStart(APP_AutoTagWarningTimer_id, 20000 - 5000); //set warning states 5 seconds before unsafe states
@@ -251,13 +255,14 @@ static void App_playAutomaticTag(void)
 			App_changePodStates(podStateRequest);
 			osTimerStart(APP_AutoTagChangeTimer_id, 20000); //start timer here (for ~20 seconds?)
 			osTimerStart(APP_AutoTagWarningTimer_id, 20000 - 5000); //set warning states 5 seconds before unsafe states
+			
 		}
 		else if(result & APP_AUTO_TAG_WARNING_TIMER_EXPIRED)
 		{
 			//Set bases that are to be unsafe to warning states first
-			podStateRequest[0] = (rand() % 2) + 1; //should give value between [1,2]
-			podStateRequest[1] = (rand() % 2) + 1; //should give value between [1,2]
-			podStateRequest[2] = (rand() % 2) + 1; //should give value between [1,2]
+			podStateRequest[0] = (rand() % 2) + 1;
+			podStateRequest[1] = (rand() % 2) + 1;
+			podStateRequest[2] = (rand() % 2) + 1;
 			warningPodStateRequest[0] = (podStateRequest[0] == UNSAFE) ? WARNING:REMAIN_SAME; //if next value is unsafe, then send warning first
 			warningPodStateRequest[1] = (podStateRequest[1] == UNSAFE) ? WARNING:REMAIN_SAME;
 			warningPodStateRequest[2] = (podStateRequest[2] == UNSAFE) ? WARNING:REMAIN_SAME;

@@ -68,15 +68,15 @@ typedef struct
 	uint8_t Pod1_Current_State;
 	uint8_t Pod2_Current_State;
 	uint8_t Pod3_Current_State;
-	bool Pod1_Detected;
-	bool Pod2_Detected;
-	bool Pod3_Detected;
+	bool Pod1_Online;
+	bool Pod2_Online;
+	bool Pod3_Online;
 }podInfo;
 
 podInfo podInfoList = {.Pod1_Address = "20FABB049EA5",.Pod2_Address = "20FABB049E77",
 											.Pod1_Connected = false,.Pod2_Connected = false,.Pod3_Connected = false,
 											.Pod1_Current_State = INIT, .Pod2_Current_State = INIT, .Pod3_Current_State = INIT,
-											.Pod1_Detected = false, .Pod2_Detected = false, .Pod3_Detected = false};
+											.Pod1_Online = false, .Pod2_Online = false, .Pod3_Online = false};
 
 static char scannedAddress[12];
 static char connectedDeviceAddress[12];
@@ -130,6 +130,7 @@ void Thread_BLE(void *arg)
 	receivedMessageQ_id = osMessageQueueNew(1,sizeof(Packet),NULL);
 	deviceConnectionRequestQ_id = osMessageQueueNew(1,sizeof(POD1),NULL);
 	requestedPodStatesQ_id = osMessageQueueNew(1,3*sizeof(uint8_t),NULL);
+	podStateRequestResultsQ_id = osMessageQueueNew(1,3*sizeof(bool),NULL);
 	while(1)
 	{
 		osThreadFlagsSet(tid_APP,BLE_INIT_AND_CONNECTED);
@@ -490,11 +491,11 @@ static void BLE_handleReceiveFlag_fromPods(void)
 			{
 				Util_copyMemory(&sBLE.rxQueue_fromPods.entry[queueEntry].data[6],(uint8_t *)scannedAddress,12);
 				if(strncmp(scannedAddress,podInfoList.Pod1_Address,12) == 0)
-					podInfoList.Pod1_Detected = true;
+					podInfoList.Pod1_Online = true;
 				else if(strncmp(scannedAddress,podInfoList.Pod2_Address,12) == 0)
-					podInfoList.Pod2_Detected = true;
+					podInfoList.Pod2_Online = true;
 				else if(strncmp(scannedAddress,podInfoList.Pod3_Address,12) == 0)
-					podInfoList.Pod3_Detected = true;
+					podInfoList.Pod3_Online = true;
 				osEventFlagsSet(BLE_Flags,BLE_MELODYSMART_ADDRESS_FOUND); //TODO: Remove?
 			}
 		}
@@ -585,25 +586,18 @@ static void BLE_initBLE_forPhone(void)
 
 static bool BLE_connectToDevice(const char *pBTAddress)
 {
+	bool result = false;
+	
 	if(sBLE.podConnected)
 		BLE_disconnectFromDevice();
 	
-	bool result = false;
-	uint8_t connection_attempts = 0;
-	do
-	{
-		connection_attempts++;
-		sBLE.BLE_currentModuleState_forPods = SENDING_COMMAND;
-		BLE_Send((uint8_t *)"CON ", 4, SEND_TO_POD);
-		BLE_Send((uint8_t *)pBTAddress, BLE_ADDRESS_LENGTH, SEND_TO_POD);
-		BLE_Send((uint8_t *)" 0\r", 3, SEND_TO_POD);
-		sBLE.BLE_currentModuleState_forPods = AWAITING_RESPONSE;
-		result = BLE_isDeviceConnected();
-		if(connection_attempts > 10) //this is just a simple way to handle the case where a pod dies. We want to give up attempting to connect to it eventually.
-			break;
-	}while(result == false);
-	
-	return result; //true if we successfully connected, and false if we had to break out of the loop
+	sBLE.BLE_currentModuleState_forPods = SENDING_COMMAND;
+	BLE_Send((uint8_t *)"CON ", 4, SEND_TO_POD);
+	BLE_Send((uint8_t *)pBTAddress, BLE_ADDRESS_LENGTH, SEND_TO_POD);
+	BLE_Send((uint8_t *)" 0\r", 3, SEND_TO_POD);
+	sBLE.BLE_currentModuleState_forPods = AWAITING_RESPONSE;
+	result = BLE_isDeviceConnected();
+	return result; //true if we successfully connected, else false
 }
 
 static bool BLE_isDeviceConnected(void) //used for pods only
@@ -632,7 +626,7 @@ static bool BLE_isDeviceConnected(void) //used for pods only
 static void BLE_waitForPods(void)
 {
 	//while((podInfoList.Pod1_Detected == false)||(podInfoList.Pod2_Detected == false)||(podInfoList.Pod3_Detected == false))
-	while(podInfoList.Pod2_Detected == false) //TODO: REMOVE AND REPLACE WITH ABOVE CODE. THIS IS FOR TESTING ONLY.
+	while(podInfoList.Pod2_Online == false) //TODO: REMOVE AND REPLACE WITH ABOVE CODE. THIS IS FOR TESTING ONLY.
 	//while((podInfoList.Pod1_Detected == false)||(podInfoList.Pod2_Detected == false)) //TODO: REMOVE AND REPLACE WITH ABOVE CODE (w/ all 3 pods). THIS IS FOR TESTING ONLY.
 	{
 		uint32_t events = osEventFlagsWait(BLE_Flags,BLE_MESSAGE_RECEIVED_FROM_PODS,osFlagsWaitAll,osWaitForever);
@@ -645,7 +639,9 @@ static void BLE_waitForPods(void)
 static void BLE_changePodStates(void)
 {
 	uint8_t requestedPodStates[3];
+	uint8_t retriesRemaining;
 	uint32_t testingResult = osMessageQueueGet(requestedPodStatesQ_id,&requestedPodStates,NULL,1000);
+	bool connectionResults[3];
 	bool connectionResult;
 
 //	if(podInfoList.Pod1_Current_State != requestedPodStates[0])
@@ -663,16 +659,26 @@ static void BLE_changePodStates(void)
 	if((podInfoList.Pod2_Current_State != requestedPodStates[1]) && (requestedPodStates[1]!=REMAIN_SAME))
 	{
 		podInfoList.Pod2_Current_State = requestedPodStates[1];
+		retriesRemaining = 5;
 		do
 		{
 			connectionResult = BLE_connectToDevice(podInfoList.Pod2_Address);
-		}while(connectionResult == false);
-		if(requestedPodStates[1]==SAFE)
-			BLE_SendCommand("SAFE");
-		else if(requestedPodStates[1]==UNSAFE)
-			BLE_SendCommand("UNSAFE");
-		else if(requestedPodStates[1]==WARNING)
-			BLE_SendCommand("WARNING");
+			retriesRemaining--;
+		}while((connectionResult == false)&&(retriesRemaining > 0));
+		if(connectionResult == true) //if we were able to successfully connect in certain amount of retries, then send command
+		{
+			podInfoList.Pod2_Online = true;
+			if(requestedPodStates[1]==SAFE)
+				BLE_SendCommand("SAFE");
+			else if(requestedPodStates[1]==UNSAFE)
+				BLE_SendCommand("UNSAFE");
+			else if(requestedPodStates[1]==WARNING)
+				BLE_SendCommand("WARNING");
+		}
+		else //indicate that pod is offline
+		{
+			podInfoList.Pod2_Online = false;
+		}
 	}
 //	if(podInfoList.Pod3_Current_State != requestedPodStates[2])
 //	{
@@ -688,6 +694,11 @@ static void BLE_changePodStates(void)
 //	}
 
 	osEventFlagsClear(APP_Request_Flags,APP_CHANGE_POD_STATES); //clear APP_CONNECT_TO_POD flag
+	//send APP thread the results from pod state change request (which pods were able to be changed or not)
+	connectionResults[0] = podInfoList.Pod1_Online;
+	connectionResults[1] = podInfoList.Pod2_Online;
+	connectionResults[2] = podInfoList.Pod3_Online;
+	osMessageQueuePut(podStateRequestResultsQ_id,&connectionResults,NULL,osWaitForever);
 }
 
 static void BLE_disconnectFromDevice(void) //will only be disconnecting from pods

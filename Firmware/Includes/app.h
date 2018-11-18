@@ -6,6 +6,7 @@ extern osThreadId_t tid_APP;
 extern osMessageQueueId_t receivedMessageQ_id;
 extern osMessageQueueId_t deviceConnectionRequestQ_id;
 extern osMessageQueueId_t requestedPodStatesQ_id;
+extern osMessageQueueId_t podStateRequestResultsQ_id;
 extern osEventFlagsId_t DMA_flags;
 extern osEventFlagsId_t APP_Request_Flags;
 extern osTimerId_t APP_AutoTagTimer_id;
