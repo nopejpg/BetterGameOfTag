@@ -406,7 +406,7 @@ static void BLE_handleReceiveFlag_fromPhone(void)
 		}
 		
 		#ifdef IS_HUB_DEVICE
-		else if(BLE_searchForKeyword((uint8_t *)"STS=P CON", queueEntry, &sBLE.rxQueue_fromPhone)) //we are successfully connected
+		else if(BLE_searchForKeyword((uint8_t *)"STS=C CON", queueEntry, &sBLE.rxQueue_fromPhone)) //we are successfully connected
 		{
 			//Change from "waiting to connection" to "connected" state
 			sBLE.BLE_currentCommsState_forPhone = CONNECTED_IDLE;
@@ -498,7 +498,7 @@ static void BLE_handleReceiveFlag_fromPods(void)
 				osEventFlagsSet(BLE_Flags,BLE_MELODYSMART_ADDRESS_FOUND); //TODO: Remove?
 			}
 		}
-		else if(BLE_searchForKeyword((uint8_t *)"STS=P CON", queueEntry, &sBLE.rxQueue_fromPods)) //we are successfully connected
+		else if(BLE_searchForKeyword((uint8_t *)"STS=C CON", queueEntry, &sBLE.rxQueue_fromPods)) //we are successfully connected
 		{
 			//Change from "waiting to connection" to "connected" state
 			sBLE.BLE_currentCommsState_forPods = CONNECTED_IDLE;
@@ -648,19 +648,19 @@ static void BLE_changePodStates(void)
 	uint32_t testingResult = osMessageQueueGet(requestedPodStatesQ_id,&requestedPodStates,NULL,1000);
 	bool connectionResult;
 
-	if(podInfoList.Pod1_Current_State != requestedPodStates[0])
-	{
-		podInfoList.Pod1_Current_State = requestedPodStates[0];
-		do
-		{
-			connectionResult = BLE_connectToDevice(podInfoList.Pod1_Address);
-		}while(connectionResult == false);
-		if(requestedPodStates[0]==SAFE)
-			BLE_SendCommand("SAFE");
-		else if(requestedPodStates[0]==UNSAFE)
-			BLE_SendCommand("UNSAFE");
-	}
-	if(podInfoList.Pod2_Current_State != requestedPodStates[1])
+//	if(podInfoList.Pod1_Current_State != requestedPodStates[0])
+//	{
+//		podInfoList.Pod1_Current_State = requestedPodStates[0];
+//		do
+//		{
+//			connectionResult = BLE_connectToDevice(podInfoList.Pod1_Address);
+//		}while(connectionResult == false);
+//		if(requestedPodStates[0]==SAFE)
+//			BLE_SendCommand("SAFE");
+//		else if(requestedPodStates[0]==UNSAFE)
+//			BLE_SendCommand("UNSAFE");
+//	}
+	if((podInfoList.Pod2_Current_State != requestedPodStates[1]) && (requestedPodStates[1]!=REMAIN_SAME))
 	{
 		podInfoList.Pod2_Current_State = requestedPodStates[1];
 		do
@@ -671,19 +671,21 @@ static void BLE_changePodStates(void)
 			BLE_SendCommand("SAFE");
 		else if(requestedPodStates[1]==UNSAFE)
 			BLE_SendCommand("UNSAFE");
+		else if(requestedPodStates[1]==WARNING)
+			BLE_SendCommand("WARNING");
 	}
-	if(podInfoList.Pod3_Current_State != requestedPodStates[2])
-	{
-		podInfoList.Pod3_Current_State = requestedPodStates[2];
-		do
-		{
-			connectionResult = BLE_connectToDevice(podInfoList.Pod3_Address);
-		}while(connectionResult == false);
-		if(requestedPodStates[2]==SAFE)
-			BLE_SendCommand("SAFE");
-		else if(requestedPodStates[2]==UNSAFE)
-			BLE_SendCommand("UNSAFE");
-	}
+//	if(podInfoList.Pod3_Current_State != requestedPodStates[2])
+//	{
+//		podInfoList.Pod3_Current_State = requestedPodStates[2];
+//		do
+//		{
+//			connectionResult = BLE_connectToDevice(podInfoList.Pod3_Address);
+//		}while(connectionResult == false);
+//		if(requestedPodStates[2]==SAFE)
+//			BLE_SendCommand("SAFE");
+//		else if(requestedPodStates[2]==UNSAFE)
+//			BLE_SendCommand("UNSAFE");
+//	}
 
 	osEventFlagsClear(APP_Request_Flags,APP_CHANGE_POD_STATES); //clear APP_CONNECT_TO_POD flag
 }

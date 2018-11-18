@@ -21,8 +21,9 @@ extern osTimerId_t APP_AutoTagTimer_id;
 #define APP_SEND_ACK (1UL << 6)
 #define APP_ENTER_CENTRAL_MODE (1UL << 7)
 #define APP_ENTER_PERIPHERAL_MODE (1UL << 8)
-#define APP_AUTO_TAG_TIMER_EXPIRED (1UL << 9)
+#define APP_AUTO_TAG_CHANGE_TIMER_EXPIRED (1UL << 9)
 #define APP_MESSAGE_PENDING_FROM_BLE (1UL << 10)
+#define APP_AUTO_TAG_WARNING_TIMER_EXPIRED (1UL << 11)
 
 #ifdef IS_HUB_DEVICE
 void Thread_APP_HUB(void * arg);

@@ -66,7 +66,8 @@ typedef enum
 	INIT,
 	SAFE,
 	UNSAFE,
-	WARNING
+	WARNING,
+	REMAIN_SAME
 }podStates;
 
 

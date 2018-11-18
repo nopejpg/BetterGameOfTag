@@ -38,7 +38,8 @@ static enum
 osThreadId_t tid_APP;
 osEventFlagsId_t DMA_flags;
 osEventFlagsId_t APP_Request_Flags;
-osTimerId_t APP_AutoTagTimer_id;
+osTimerId_t APP_AutoTagChangeTimer_id;
+osTimerId_t APP_AutoTagWarningTimer_id;
 osMessageQueueId_t receivedMessageQ_id;
 osMessageQueueId_t deviceConnectionRequestQ_id;
 osMessageQueueId_t requestedPodStatesQ_id;
@@ -80,12 +81,14 @@ static void App_playManualTag(void);
 static void App_playAutomaticTag(void);
 static void App_playRLGL(void);
 
-static void App_autoTagTimer_Callback(void *arg);
+static void App_autoTagChangeTimer_Callback(void *arg);
+static void App_autoTagWarningTimer_Callback(void *arg);
 
 void Thread_APP_HUB(void *arg)
 {
 	APP_Request_Flags = osEventFlagsNew(NULL);
-	APP_AutoTagTimer_id = osTimerNew(App_autoTagTimer_Callback,osTimerOnce,NULL,NULL);
+	APP_AutoTagChangeTimer_id = osTimerNew(App_autoTagChangeTimer_Callback,osTimerOnce,NULL,NULL);
+	APP_AutoTagWarningTimer_id = osTimerNew(App_autoTagWarningTimer_Callback,osTimerOnce,NULL,NULL);
 	uint32_t flags = osThreadFlagsWait(BLE_INIT_AND_CONNECTED,osFlagsWaitAll,osWaitForever); //ensure BLE module is set up before attempting to send commands to it
 	
 	Control_RGB_LEDs(1,0,0); //debug LEDs
@@ -207,41 +210,72 @@ static void App_playManualTag(void)
 
 static void App_playAutomaticTag(void)
 {
+	/*
+	Algorithm for automatic tag:
+	1. Initialize bases to some random states
+	2. Start timer for next time bases change
+	3. Start timer for next time warning states should be set (this will always be a shorter timer than the "change" timer
+	4. Wait for warning timer to expire
+	5. When the warning timer expires, calculate the next state values
+	6. Based on which states will be safe/unsafe, set the warning states accordingly.
+	7. Wait for change timer to expire
+	8. When the change timer expires, set pods to previously calculated states
+	9. Reset warning and change timers
+	10. Repeat steps 4-9 until EXIT_GAME command is given
+	*/
+	
+	//initialize pods with random states and kick off timers
+	static uint8_t podStateRequest[3];
+	static uint8_t warningPodStateRequest[3];
+	podStateRequest[0] = (rand() % 2) + 1; //should give value between [1,2]
+	podStateRequest[1] = (rand() % 2) + 1; //should give value between [1,2]
+	podStateRequest[2] = (rand() % 2) + 1; //should give value between [1,2]
+	App_changePodStates(podStateRequest); //change pod states
+	osTimerStart(APP_AutoTagChangeTimer_id, 20000);
+	osTimerStart(APP_AutoTagWarningTimer_id, 20000 - 5000); //set warning states 5 seconds before unsafe states
+	
 	while(HubState == AUTO_TAG)
 	{
-		static uint8_t podStateRequest[3];
-		//randomize and change pod states here
-		podStateRequest[0] = (rand() % 2) + 1; //should give value between [1,2]
-		podStateRequest[1] = (rand() % 2) + 1; //should give value between [1,2]
-		podStateRequest[2] = (rand() % 2) + 1; //should give value between [1,2]
-		//start timer here (for ~20 seconds?)
-		osTimerStart(APP_AutoTagTimer_id, 20000);
-		
-		//Control_RGB_LEDs(pod1_State,pod2_State,pod3_State); //stand-in for BLE commands
-		App_changePodStates(podStateRequest);
-		
-		uint32_t result = osEventFlagsWait(APP_Request_Flags, APP_AUTO_TAG_TIMER_EXPIRED|APP_MESSAGE_PENDING_FROM_BLE, NULL, osWaitForever);
+		uint32_t result = osEventFlagsWait(APP_Request_Flags, APP_AUTO_TAG_CHANGE_TIMER_EXPIRED|APP_AUTO_TAG_WARNING_TIMER_EXPIRED|APP_MESSAGE_PENDING_FROM_BLE, NULL, osWaitForever);
 		if(result & APP_MESSAGE_PENDING_FROM_BLE)
 		{
 			uint32_t result = osMessageQueueGet(receivedMessageQ_id, &sAPP.rxMessage, NULL, 1000);
 			if(strstr((const char *)sAPP.rxMessage.dataBuffer,"EXIT_GAME") != NULL)
 			{
-				#ifndef PERIPHERAL_WORKAROUND
 				App_SendAck();
-				#endif
 				HubState = HUB_READY;
 			}
 		}
-		else if(result & APP_AUTO_TAG_TIMER_EXPIRED)
+		else if(result & APP_AUTO_TAG_CHANGE_TIMER_EXPIRED) //when time for new states, randomize and change to new states
 		{
-			//dont need to do anything. keep looping until EXIT_GAME command
+			App_changePodStates(podStateRequest);
+			osTimerStart(APP_AutoTagChangeTimer_id, 20000); //start timer here (for ~20 seconds?)
+			osTimerStart(APP_AutoTagWarningTimer_id, 20000 - 5000); //set warning states 5 seconds before unsafe states
+		}
+		else if(result & APP_AUTO_TAG_WARNING_TIMER_EXPIRED)
+		{
+			//Set bases that are to be unsafe to warning states first
+			podStateRequest[0] = (rand() % 2) + 1; //should give value between [1,2]
+			podStateRequest[1] = (rand() % 2) + 1; //should give value between [1,2]
+			podStateRequest[2] = (rand() % 2) + 1; //should give value between [1,2]
+			warningPodStateRequest[0] = (podStateRequest[0] == UNSAFE) ? WARNING:REMAIN_SAME; //if next value is unsafe, then send warning first
+			warningPodStateRequest[1] = (podStateRequest[1] == UNSAFE) ? WARNING:REMAIN_SAME;
+			warningPodStateRequest[2] = (podStateRequest[2] == UNSAFE) ? WARNING:REMAIN_SAME;
+			App_changePodStates(warningPodStateRequest); //set relevant pods to warning state
 		}
 	}
 }
 
-void App_autoTagTimer_Callback(void *arg)
+static void App_autoTagChangeTimer_Callback(void *arg)
 {
-	osEventFlagsSet(APP_Request_Flags,APP_AUTO_TAG_TIMER_EXPIRED);
+	//function used for telling app thread that it is time to change bases again
+	osEventFlagsSet(APP_Request_Flags,APP_AUTO_TAG_CHANGE_TIMER_EXPIRED);
+}
+
+static void App_autoTagWarningTimer_Callback(void *arg)
+{
+	//function used for telling app thread that it is time to set warnings again
+	osEventFlagsSet(APP_Request_Flags,APP_AUTO_TAG_WARNING_TIMER_EXPIRED);
 }
 
 #else
