@@ -73,8 +73,12 @@ public class ScanActivity extends AppCompatActivity {
     private Button mAdvertiseButton;
     private Button advertiseSkipButton;
     private Button connectButton;
-    private Button testConnectionButton;
-    private Button testConnectionButton2;
+    private Button testAutoTag;
+    private Button testQuitGame;
+    private Button testManTag;
+    private Button testRLGL;
+    private Button testSUS;
+    private Button testUSU;
     private TextView testOutputText;
     //UUIDs "They're also in the strings.xml. 'm having a hard time using R.strings  command... So they're hardcoded" **now theyre in UARTProfile.java
     private BluetoothGattServer mGattServer;
@@ -102,22 +106,21 @@ public class ScanActivity extends AppCompatActivity {
     //create pages
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        BluetoothAdapter.getDefaultAdapter().setName("BGOT");
+        // BluetoothAdapter.getDefaultAdapter().setName("BGOT");
         super.onCreate(savedInstanceState);
         setContentView(layout.activity_scan);
         mText = findViewById(id.text);
         advertising = false;
 
-        testOutputText = findViewById(id.testOutputText);
 
-        advertiseSkipButton = findViewById(id.advertiseSkipButton);
-        advertiseSkipButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent mainMenuIntent = new Intent(v.getContext(), MainMenuActivity.class);
-                startActivity(mainMenuIntent);
-            }
-        });
+        //advertiseSkipButton = findViewById(id.advertiseSkipButton);
+//        advertiseSkipButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Intent mainMenuIntent = new Intent(v.getContext(), MainMenuActivity.class);
+//                startActivity(mainMenuIntent);
+//            }
+//        });
 
         connectButton = findViewById(id.connectButton);
         connectButton.setOnClickListener(new View.OnClickListener() {
@@ -130,16 +133,48 @@ public class ScanActivity extends AppCompatActivity {
             }
         });
 
-        testConnectionButton = findViewById(id.testConnectionButton);
-        testConnectionButton.setOnClickListener(new View.OnClickListener() {
+        testManTag = findViewById(id.testManTag);
+        testManTag.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sendMessage("MAN_TAG");
+            }
+        });
+
+        testAutoTag = findViewById(id.testAutoTag);
+        testAutoTag.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 sendMessage("AUTOMATE_TAG");
             }
         });
 
-        testConnectionButton2 = findViewById(id.testConnectionButton2);
-        testConnectionButton2.setOnClickListener(new View.OnClickListener() {
+        testRLGL = findViewById(id.testRLGL);
+        testRLGL.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sendMessage("RL_GL");
+            }
+        });
+
+        testSUS = findViewById(id.testManTagSUS);
+        testSUS.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sendMessage("%SUS");
+            }
+        });
+
+        testUSU = findViewById(id.testManTagUSU);
+        testUSU.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sendMessage("%USU");
+            }
+        });
+
+        testQuitGame = findViewById(id.testQuitGame);
+        testQuitGame.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 sendMessage("EXIT_GAME");
@@ -149,7 +184,7 @@ public class ScanActivity extends AppCompatActivity {
 
     private void sendMessage(String mes) {
         if (!commsReady) {
-            testOutputText.setText("Communication service not connected");
+//            testOutputText.setText("Communication service not connected");
             connectAsCentral();
             return;
         }
@@ -170,11 +205,11 @@ public class ScanActivity extends AppCompatActivity {
 
         commsCharacteristic.setValue(messageBytes);
         boolean success = mBluetoothGatt.writeCharacteristic(commsCharacteristic);
-        if (success) {
-            testOutputText.setText("successful write");
-        } else {
-            testOutputText.setText("UNsuccessful write");
-        }
+//        if (success) {
+//            testOutputText.setText("successful write");
+//        } else {
+//            testOutputText.setText("UNsuccessful write");
+//        }
     }
 
     private void connectAsCentral() {
@@ -202,7 +237,7 @@ public class ScanActivity extends AppCompatActivity {
             builder.show();
         }
 
-        testOutputText.setText("Scanning...");
+//        testOutputText.setText("Scanning...");
         AsyncTask.execute(new Runnable() {
             @Override
             public void run() {
@@ -247,7 +282,7 @@ public class ScanActivity extends AppCompatActivity {
 
 //            if (deviceAddress.equals("20:FA:BB:04:9E:7B") && !connectedToPeripheral) { //<--Marc's BLE
             if (deviceAddress.equals("20:FA:BB:04:9E:BC") && !connectedToPeripheral) { //<--Forrest's BLE
-                testOutputText.setText("Hub Discovered");
+//                testOutputText.setText("Hub Discovered");
 
                 mBluetoothGatt = result.getDevice().connectGatt(getApplicationContext(), true, mGattCallback);
 
