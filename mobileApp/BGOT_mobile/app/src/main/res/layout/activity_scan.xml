@@ -36,15 +36,15 @@
         android:id="@+id/testQuitGame"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
+        android:layout_marginBottom="132dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="144dp"
+        android:layout_marginTop="8dp"
         android:text="Quit Game"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/testRLGL" />
+        app:layout_constraintTop_toBottomOf="@+id/button2" />
 
     <Button
         android:id="@+id/testManTag"
@@ -64,38 +64,63 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="56dp"
         android:text="Start RL/GL"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/testManTag" />
+        app:layout_constraintTop_toBottomOf="@+id/testManTagSUS" />
 
     <Button
         android:id="@+id/testManTagSUS"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_marginStart="96dp"
-        android:layout_marginTop="12dp"
+        android:layout_marginStart="120dp"
+        android:layout_marginTop="32dp"
         android:text="SUS"
-        app:layout_constraintBottom_toTopOf="@+id/testQuitGame"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/testRLGL"
-        app:layout_constraintVertical_bias="0.506" />
+        app:layout_constraintTop_toBottomOf="@+id/testManTag" />
 
     <Button
         android:id="@+id/testManTagUSU"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="116dp"
+        android:layout_marginTop="32dp"
+        android:text="USU"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/testManTag" />
+
+    <Button
+        android:id="@+id/testRLGLRun"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="40dp"
+        android:layout_marginTop="32dp"
+        android:text="Run"
+        app:layout_constraintEnd_toStartOf="@+id/testRLGLWalk"
+        app:layout_constraintTop_toBottomOf="@+id/testRLGL" />
+
+    <Button
+        android:id="@+id/testRLGLWalk"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:text="USU"
-        app:layout_constraintBottom_toTopOf="@+id/testQuitGame"
+        android:layout_marginTop="32dp"
+        android:text="Walk"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/testManTagSUS"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/testRLGL" />
+
+    <Button
+        android:id="@+id/testRLGLStop"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="44dp"
+        android:layout_marginTop="32dp"
+        android:text="Stop"
+        app:layout_constraintStart_toEndOf="@+id/testRLGLWalk"
         app:layout_constraintTop_toBottomOf="@+id/testRLGL" />
 
 

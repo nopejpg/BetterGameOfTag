@@ -79,6 +79,9 @@ public class ScanActivity extends AppCompatActivity {
     private Button testRLGL;
     private Button testSUS;
     private Button testUSU;
+    private Button testRLGLWalk;
+    private Button testRLGLRun;
+    private Button testRLGLStop;
     private TextView testOutputText;
     //UUIDs "They're also in the strings.xml. 'm having a hard time using R.strings  command... So they're hardcoded" **now theyre in UARTProfile.java
     private BluetoothGattServer mGattServer;
@@ -180,6 +183,31 @@ public class ScanActivity extends AppCompatActivity {
                 sendMessage("EXIT_GAME");
             }
         });
+
+        testRLGLRun = findViewById(id.testRLGLRun);
+        testRLGLRun.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sendMessage("RUN");
+            }
+        });
+
+        testRLGLWalk = findViewById(id.testRLGLWalk);
+        testRLGLWalk.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sendMessage("WALK");
+            }
+        });
+
+        testRLGLStop = findViewById(id.testRLGLStop);
+        testRLGLStop.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sendMessage("STOP");
+            }
+        });
+
     }
 
     private void sendMessage(String mes) {
