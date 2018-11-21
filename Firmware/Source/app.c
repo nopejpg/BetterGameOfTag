@@ -113,18 +113,17 @@ void Thread_APP_HUB(void *arg)
 			if(strstr((const char *)sAPP.rxMessage.dataBuffer,"MAN_TAG") != NULL) //if we are commanded to play manual tag
 			{
 				App_SendAck();
-				
 				HubState = MANUAL_TAG;
 			}
 			else if(strstr((const char *)sAPP.rxMessage.dataBuffer,"AUTOMATE_TAG") != NULL) //if we are commanded to play automatic tag
 			{
 				App_SendAck();
-				
 				HubState = AUTO_TAG;
 			}
 			else if(strstr((const char *)sAPP.rxMessage.dataBuffer,"RL_GL") != NULL) //if we are commanded to play red-light/green-light
 			{
-				//TODO
+				App_SendAck();
+				HubState = RL_GL;
 			}
 		}
 		if(HubState == MANUAL_TAG)
@@ -137,7 +136,7 @@ void Thread_APP_HUB(void *arg)
 		}
 		else if(HubState == RL_GL)
 		{
-			
+			App_playRLGL();
 		}
 	}
 }
@@ -175,9 +174,7 @@ static void App_playManualTag(void)
 			osEventFlagsSet(BLE_Flags,BLE_RECEIVED_MESSAGE_TRANSFERRED); //let BLE module know that we are done with it's data, and that it is free to clear it
 			if(sAPP.rxMessage.dataBuffer[0] == '%') //check if this is a command
 			{
-				#ifndef PERIPHERAL_WORKAROUND
 				App_SendAck();
-				#endif
 				/*
 				An example command to change states looks like this: %SUS
 				3 positions after the %: one for each pod.
@@ -203,9 +200,7 @@ static void App_playManualTag(void)
 			}
 			else if(strstr((const char *)sAPP.rxMessage.dataBuffer,"EXIT_GAME") != NULL)
 			{
-				#ifndef PERIPHERAL_WORKAROUND
 				App_SendAck();
-				#endif
 				HubState = HUB_READY;
 			}
 		}
@@ -271,6 +266,51 @@ static void App_playAutomaticTag(void)
 	}
 }
 
+static void App_playRLGL(void)
+{
+	static uint8_t podStateRequest[3];
+	while(HubState == RL_GL)
+	{
+		uint32_t result = osEventFlagsWait(APP_Request_Flags, APP_MESSAGE_PENDING_FROM_BLE, NULL, osWaitForever);
+		if(result & APP_MESSAGE_PENDING_FROM_BLE)
+		{
+			uint32_t result = osMessageQueueGet(receivedMessageQ_id, &sAPP.rxMessage, NULL, 1000);
+			if(result == osOK)
+			{
+				osEventFlagsSet(BLE_Flags,BLE_RECEIVED_MESSAGE_TRANSFERRED); //let BLE module know that we are done with it's data, and that it is free to clear it
+				if(strstr((const char *)sAPP.rxMessage.dataBuffer,"RUN") != NULL)
+				{
+					Util_copyMemory((uint8_t[]){OFF, OFF, OFF}, podStateRequest, 3); //turn off all pods
+					App_changePodStates(podStateRequest);
+					podStateRequest[0] = RUN; 
+					App_changePodStates(podStateRequest); //set desired state
+				}
+				else if(strstr((const char *)sAPP.rxMessage.dataBuffer,"WALK") != NULL)
+				{
+					Util_copyMemory((uint8_t[]){OFF, OFF, OFF}, podStateRequest, 3);
+					App_changePodStates(podStateRequest);
+					podStateRequest[1] = WALK;
+					App_changePodStates(podStateRequest);
+				}
+				else if(strstr((const char *)sAPP.rxMessage.dataBuffer,"STOP") != NULL)
+				{
+					Util_copyMemory((uint8_t[]){OFF, OFF, OFF}, podStateRequest, 3);
+					App_changePodStates(podStateRequest);
+					podStateRequest[2] = STOP;
+					App_changePodStates(podStateRequest);
+				}
+				else if(strstr((const char *)sAPP.rxMessage.dataBuffer,"EXIT_GAME") != NULL)
+				{
+					App_SendAck();
+					HubState = HUB_READY;
+				}
+			}
+		}
+	}
+}
+
+
+
 static void App_autoTagChangeTimer_Callback(void *arg)
 {
 	//function used for telling app thread that it is time to change bases again
@@ -317,20 +357,26 @@ void Thread_APP_POD(void *arg)
 				App_SendAck();
 				Control_RGB_LEDs(1,1,0);
 			}
-			else if(strstr((const char *)sAPP.rxMessage.dataBuffer,"GO") != NULL) //if GO message
+			else if(strstr((const char *)sAPP.rxMessage.dataBuffer,"OFF") != NULL) //if WARNING message
+			{
+				App_SendAck();
+				Control_RGB_LEDs(0,0,0);
+			}
+			else if(strstr((const char *)sAPP.rxMessage.dataBuffer,"RUN") != NULL) //if GO message
 			{
 				App_SendAck();
 				Control_RGB_LEDs(0,1,0);
-//				Play_Recording(Go_Audio,sizeof(Go_Audio)/sizeof(Go_Audio[0]));
-//				osEventFlagsWait(DMA_flags,DMA_REC_COMPLETE, osFlagsWaitAll, osWaitForever);
 				playGoodNoise();
+			}
+			else if(strstr((const char *)sAPP.rxMessage.dataBuffer,"WALK") != NULL) //if GO message
+			{
+				App_SendAck();
+				Control_RGB_LEDs(1,1,0);
 			}
 			else if(strstr((const char *)sAPP.rxMessage.dataBuffer,"STOP") != NULL) //if STOP message
 			{
 				App_SendAck();
 				Control_RGB_LEDs(1,0,0);
-//				Play_Recording(Stop_Audio,sizeof(Stop_Audio)/sizeof(Stop_Audio[0]));
-//				osEventFlagsWait(DMA_flags,DMA_REC_COMPLETE, osFlagsWaitAll, osWaitForever);
 				playBadNoise();
 			}
 		}

@@ -64,10 +64,16 @@ typedef enum
 typedef enum
 {
 	INIT,
+	//states for tag games
 	SAFE,
 	UNSAFE,
 	WARNING,
-	REMAIN_SAME
+	REMAIN_SAME,
+	//states for RL_GL game
+	OFF,
+	RUN,
+	WALK,
+	STOP
 }podStates;
 
 

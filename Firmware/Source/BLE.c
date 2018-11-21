@@ -73,7 +73,7 @@ typedef struct
 	bool Pod3_Online;
 }podInfo;
 
-podInfo podInfoList = {.Pod1_Address = "20FABB049EA5",.Pod2_Address = "20FABB049E77",
+podInfo podInfoList = {.Pod1_Address = "20FABB049EA5",.Pod2_Address = "20FABB049E77", .Pod3_Address = "20FABB049E7B",
 											.Pod1_Connected = false,.Pod2_Connected = false,.Pod3_Connected = false,
 											.Pod1_Current_State = INIT, .Pod2_Current_State = INIT, .Pod3_Current_State = INIT,
 											.Pod1_Online = false, .Pod2_Online = false, .Pod3_Online = false};
@@ -524,8 +524,9 @@ static void BLE_SendCommand(const char *pString)
 {
 	//this function will use BLE_SendPacket, mixed with retries, to help ensure faithful communication to other bluetooth device.
 	//Only the hub will be using this function (to send instructions to pod devices). The pod devices will send back ACKs using the BLE_SendAck function.
-	uint32_t flags;
 	uint8_t packetLength = BLE_BuildPacket(pString);
+	uint32_t startingTickCount;
+	uint32_t currentTickCount;
 	if(packetLength > 0)
 	{
 		//send packet
@@ -535,9 +536,19 @@ static void BLE_SendCommand(const char *pString)
 			sBLE.BLE_currentCommsState_forPods = SENDING_PACKET;
 			BLE_SendPacket(packetLength, SEND_TO_POD);
 			sBLE.BLE_currentCommsState_forPods = AWAITING_ACK;
-			flags = osEventFlagsWait(BLE_Flags,BLE_ACK_RECEIVED,osFlagsWaitAll,3000); //suspend app thread execution until ack is received
-			if(flags & BLE_ACK_RECEIVED)
+			
+			startingTickCount = osKernelGetTickCount();
+			do
 			{
+				osEventFlagsWait(BLE_Flags,BLE_MESSAGE_RECEIVED_FROM_PODS,osFlagsWaitAll,100);
+				BLE_handleReceiveFlag_fromPods();
+				currentTickCount = osKernelGetTickCount();
+			}while(((osEventFlagsGet(BLE_Flags) & BLE_ACK_RECEIVED)!=BLE_ACK_RECEIVED)&&(currentTickCount < (startingTickCount+3000)));
+			
+			//flags = osEventFlagsWait(BLE_Flags,BLE_ACK_RECEIVED,osFlagsWaitAll,3000); //suspend app thread execution until ack is received
+			if(osEventFlagsGet(BLE_Flags) & BLE_ACK_RECEIVED)
+			{
+				osEventFlagsClear(BLE_Flags,BLE_ACK_RECEIVED);
 				sBLE.BLE_currentCommsState_forPods = ACK_RECEIVED;
 				break; //no need to retry
 			}
@@ -596,6 +607,7 @@ static bool BLE_connectToDevice(const char *pBTAddress)
 	BLE_Send((uint8_t *)pBTAddress, BLE_ADDRESS_LENGTH, SEND_TO_POD);
 	BLE_Send((uint8_t *)" 0\r", 3, SEND_TO_POD);
 	sBLE.BLE_currentModuleState_forPods = AWAITING_RESPONSE;
+	osDelay(500); //TESTING: wait to give connection time to establish
 	result = BLE_isDeviceConnected();
 	return result; //true if we successfully connected, else false
 }
@@ -625,9 +637,9 @@ static bool BLE_isDeviceConnected(void) //used for pods only
 
 static void BLE_waitForPods(void)
 {
-	//while((podInfoList.Pod1_Detected == false)||(podInfoList.Pod2_Detected == false)||(podInfoList.Pod3_Detected == false))
-	while(podInfoList.Pod2_Online == false) //TODO: REMOVE AND REPLACE WITH ABOVE CODE. THIS IS FOR TESTING ONLY.
-	//while((podInfoList.Pod1_Detected == false)||(podInfoList.Pod2_Detected == false)) //TODO: REMOVE AND REPLACE WITH ABOVE CODE (w/ all 3 pods). THIS IS FOR TESTING ONLY.
+	while((podInfoList.Pod1_Online == false)||(podInfoList.Pod2_Online == false)||(podInfoList.Pod3_Online == false))
+	//while(podInfoList.Pod2_Online == false) //TODO: REMOVE AND REPLACE WITH ABOVE CODE. THIS IS FOR TESTING ONLY.
+	//while((podInfoList.Pod1_Online == false)||(podInfoList.Pod2_Online == false)) //TODO: REMOVE AND REPLACE WITH ABOVE CODE (w/ all 3 pods). THIS IS FOR TESTING ONLY.
 	{
 		uint32_t events = osEventFlagsWait(BLE_Flags,BLE_MESSAGE_RECEIVED_FROM_PODS,osFlagsWaitAll,osWaitForever);
 		BLE_handleReceiveFlag_fromPods();
@@ -644,21 +656,41 @@ static void BLE_changePodStates(void)
 	bool connectionResults[3];
 	bool connectionResult;
 
-//	if(podInfoList.Pod1_Current_State != requestedPodStates[0])
-//	{
-//		podInfoList.Pod1_Current_State = requestedPodStates[0];
-//		do
-//		{
-//			connectionResult = BLE_connectToDevice(podInfoList.Pod1_Address);
-//		}while(connectionResult == false);
-//		if(requestedPodStates[0]==SAFE)
-//			BLE_SendCommand("SAFE");
-//		else if(requestedPodStates[0]==UNSAFE)
-//			BLE_SendCommand("UNSAFE");
-//	}
+	if((podInfoList.Pod1_Current_State != requestedPodStates[0]) && (requestedPodStates[0]!=REMAIN_SAME))
+	{
+		retriesRemaining = 5;
+		do
+		{
+			connectionResult = BLE_connectToDevice(podInfoList.Pod1_Address);
+			retriesRemaining--;
+		}while((connectionResult == false)&&(retriesRemaining > 0));
+		if(connectionResult == true) //if we were able to successfully connect in certain amount of retries, then send command
+		{
+			podInfoList.Pod1_Online = true;
+			if(requestedPodStates[0]==SAFE)
+				BLE_SendCommand("SAFE");
+			else if(requestedPodStates[0]==UNSAFE)
+				BLE_SendCommand("UNSAFE");
+			else if(requestedPodStates[0]==WARNING)
+				BLE_SendCommand("WARNING");
+			else if(requestedPodStates[0]==OFF)
+				BLE_SendCommand("OFF");
+			else if(requestedPodStates[0]==RUN)
+				BLE_SendCommand("RUN");
+			else if(requestedPodStates[0]==WALK)
+				BLE_SendCommand("WALK");
+			else if(requestedPodStates[0]==STOP)
+				BLE_SendCommand("STOP");
+			podInfoList.Pod1_Current_State = requestedPodStates[0];
+		}
+		else //indicate that pod is offline
+		{
+			podInfoList.Pod1_Online = false;
+		}
+	}
+	
 	if((podInfoList.Pod2_Current_State != requestedPodStates[1]) && (requestedPodStates[1]!=REMAIN_SAME))
 	{
-		podInfoList.Pod2_Current_State = requestedPodStates[1];
 		retriesRemaining = 5;
 		do
 		{
@@ -674,24 +706,54 @@ static void BLE_changePodStates(void)
 				BLE_SendCommand("UNSAFE");
 			else if(requestedPodStates[1]==WARNING)
 				BLE_SendCommand("WARNING");
+			else if(requestedPodStates[1]==OFF)
+				BLE_SendCommand("OFF");
+			else if(requestedPodStates[1]==RUN)
+				BLE_SendCommand("RUN");
+			else if(requestedPodStates[1]==WALK)
+				BLE_SendCommand("WALK");
+			else if(requestedPodStates[1]==STOP)
+				BLE_SendCommand("STOP");
+			podInfoList.Pod2_Current_State = requestedPodStates[1];
 		}
 		else //indicate that pod is offline
 		{
 			podInfoList.Pod2_Online = false;
 		}
 	}
-//	if(podInfoList.Pod3_Current_State != requestedPodStates[2])
-//	{
-//		podInfoList.Pod3_Current_State = requestedPodStates[2];
-//		do
-//		{
-//			connectionResult = BLE_connectToDevice(podInfoList.Pod3_Address);
-//		}while(connectionResult == false);
-//		if(requestedPodStates[2]==SAFE)
-//			BLE_SendCommand("SAFE");
-//		else if(requestedPodStates[2]==UNSAFE)
-//			BLE_SendCommand("UNSAFE");
-//	}
+	
+	if((podInfoList.Pod3_Current_State != requestedPodStates[2]) && (requestedPodStates[2]!=REMAIN_SAME))
+	{
+		retriesRemaining = 5;
+		do
+		{
+			connectionResult = BLE_connectToDevice(podInfoList.Pod3_Address);
+			retriesRemaining--;
+		}while((connectionResult == false)&&(retriesRemaining > 0));
+		if(connectionResult == true) //if we were able to successfully connect in certain amount of retries, then send command
+		{
+			podInfoList.Pod3_Online = true;
+			if(requestedPodStates[2]==SAFE)
+				BLE_SendCommand("SAFE");
+			else if(requestedPodStates[2]==UNSAFE)
+				BLE_SendCommand("UNSAFE");
+			else if(requestedPodStates[2]==WARNING)
+				BLE_SendCommand("WARNING");
+			else if(requestedPodStates[2]==OFF)
+				BLE_SendCommand("OFF");
+			else if(requestedPodStates[2]==RUN)
+				BLE_SendCommand("RUN");
+			else if(requestedPodStates[2]==WALK)
+				BLE_SendCommand("WALK");
+			else if(requestedPodStates[2]==STOP)
+				BLE_SendCommand("STOP");
+			podInfoList.Pod3_Current_State = requestedPodStates[2];
+		}
+		else //indicate that pod is offline
+		{
+			podInfoList.Pod3_Online = false;
+		}
+	}
 
 	osEventFlagsClear(APP_Request_Flags,APP_CHANGE_POD_STATES); //clear APP_CONNECT_TO_POD flag
 	//send APP thread the results from pod state change request (which pods were able to be changed or not)
