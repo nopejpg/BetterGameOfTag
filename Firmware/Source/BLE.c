@@ -607,7 +607,7 @@ static bool BLE_connectToDevice(const char *pBTAddress)
 	BLE_Send((uint8_t *)pBTAddress, BLE_ADDRESS_LENGTH, SEND_TO_POD);
 	BLE_Send((uint8_t *)" 0\r", 3, SEND_TO_POD);
 	sBLE.BLE_currentModuleState_forPods = AWAITING_RESPONSE;
-	osDelay(500); //TESTING: wait to give connection time to establish
+	osDelay(500); //wait to give connection time to establish
 	result = BLE_isDeviceConnected();
 	return result; //true if we successfully connected, else false
 }
@@ -617,7 +617,7 @@ static bool BLE_isDeviceConnected(void) //used for pods only
 	sBLE.BLE_currentModuleState_forPods = SENDING_COMMAND;
 	BLE_Send((uint8_t *)"STS\r", 4, SEND_TO_POD);
 	sBLE.BLE_currentModuleState_forPods = AWAITING_RESPONSE;
-	osDelay(500); //Give time for all messages to come in so we can process them all at once
+	osDelay(100); //Give time for all messages to come in so we can process them all at once. TESTING: WAS 500
 	uint32_t events = osEventFlagsWait(BLE_Flags,BLE_MESSAGE_RECEIVED_FROM_PODS,osFlagsWaitAll,osWaitForever);
 	BLE_handleReceiveFlag_fromPods();
 	
@@ -760,7 +760,13 @@ static void BLE_changePodStates(void)
 	connectionResults[0] = podInfoList.Pod1_Online;
 	connectionResults[1] = podInfoList.Pod2_Online;
 	connectionResults[2] = podInfoList.Pod3_Online;
-	osMessageQueuePut(podStateRequestResultsQ_id,&connectionResults,NULL,osWaitForever);
+	//osMessageQueuePut(podStateRequestResultsQ_id,&connectionResults,NULL,osWaitForever);
+	
+	//TESTING: Send pod statuses to phone after every state change
+	char podStatusMessage[12];
+	sprintf(podStatusMessage,"STAT_%d%d%d",podInfoList.Pod1_Online,podInfoList.Pod2_Online,podInfoList.Pod3_Online);
+	uint8_t packetLength = BLE_BuildPacket(podStatusMessage);
+	BLE_SendPacket(packetLength, SEND_TO_PHONE);
 }
 
 static void BLE_disconnectFromDevice(void) //will only be disconnecting from pods

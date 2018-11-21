@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "cmsis_os2.h"
+#include <stdio.h>
 
 /*BLE Module Flags Below (used for synchronizing events within the BLE class/module*/
 #define BLE_MESSAGE_RECEIVED_FROM_PHONE (1UL << 0)
