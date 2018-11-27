@@ -14,6 +14,7 @@ public class MainMenuActivity extends AppCompatActivity {
     Button manualTagButton;
     Button redLightGreenLightButton;
     ImageButton settingsButton;
+    BluetoothServices bluetooth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +53,8 @@ public class MainMenuActivity extends AppCompatActivity {
                 goToSettings();
             }
         });
+
+        bluetooth=new BluetoothServices(this);
     }
 
     public void runAutoTag() {

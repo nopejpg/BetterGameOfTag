@@ -1,5 +1,6 @@
 package com.bgot.marccelestini.bgot_mobile;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -12,11 +13,14 @@ public class RLGLActivity extends AppCompatActivity {
     RadioButton rlglGreenRadio;
     Button rlglQuitButton;
     Button rlglPlayButton;
+    BluetoothServices bluetooth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_rlgl);
+
+        bluetooth=new BluetoothServices(this);
 
         rlglGreenRadio = findViewById(R.id.rlglGreenRadio);
         rlglRedRadio = findViewById(R.id.rlglRedRadio);
@@ -29,11 +33,28 @@ public class RLGLActivity extends AppCompatActivity {
         rlglYellowRadio.setChecked(false);
         rlglGreenRadio.setChecked(false);
 
+        rlglPlayButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                bluetooth.sendMessage("RL_GL");
+            }
+        });
+
+        rlglPlayButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                bluetooth.sendMessage("EXIT_GAME");
+                Intent intent = new Intent(getApplicationContext(), MainMenuActivity.class);
+                startActivity(intent);
+            }
+        });
+
         rlglGreenRadio.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 rlglRedRadio.setChecked(false);
                 rlglYellowRadio.setChecked(false);
+                bluetooth.sendMessage("RUN");
             }
         });
 
@@ -42,6 +63,7 @@ public class RLGLActivity extends AppCompatActivity {
             public void onClick(View v) {
                 rlglRedRadio.setChecked(false);
                 rlglGreenRadio.setChecked(false);
+                bluetooth.sendMessage("WALK");
             }
         });
 
@@ -50,7 +72,10 @@ public class RLGLActivity extends AppCompatActivity {
             public void onClick(View v) {
                 rlglGreenRadio.setChecked(false);
                 rlglYellowRadio.setChecked(false);
+                bluetooth.sendMessage("STOP");
             }
         });
+
+
     }
 }

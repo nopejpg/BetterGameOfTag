@@ -38,12 +38,13 @@
         android:id="@+id/manualTagBottomDivider"
         android:layout_width="585dp"
         android:layout_height="1dp"
-        android:layout_marginBottom="212dp"
+        android:layout_marginBottom="184dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:background="?android:attr/listDivider"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent" />
 
     <Button
@@ -51,7 +52,7 @@
         android:layout_width="157dp"
         android:layout_height="98dp"
         android:layout_marginBottom="8dp"
-        android:layout_marginStart="112dp"
+        android:layout_marginStart="104dp"
         android:layout_marginTop="76dp"
         android:text="Play"
         android:textSize="30sp"
@@ -157,6 +158,22 @@
         android:trackTint="@android:color/holo_blue_light"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/manualTagTopDivider" />
+
+    <Button
+        android:id="@+id/manualTagUpdateButton"
+        android:layout_width="233dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="Update Pods"
+        android:textSize="24sp"
+        app:layout_constraintBottom_toTopOf="@+id/manualTagBottomDivider"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/manualTagPod3Label"
+        app:layout_constraintVertical_bias="0.679" />
 
 
 </android.support.constraint.ConstraintLayout>
