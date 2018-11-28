@@ -58,18 +58,22 @@ public class MainMenuActivity extends AppCompatActivity {
     }
 
     public void runAutoTag() {
+        bluetooth.disconnectGattServer();
         Intent intent = new Intent(this, AutomatedTagActivity.class);
         startActivity(intent);
     }
     public void runManualTag() {
+        bluetooth.disconnectGattServer();
         Intent intent = new Intent(this, ManualTagActivity.class);
         startActivity(intent);
     }
     public void runRLGL() {
+        bluetooth.disconnectGattServer();
         Intent intent = new Intent(this, RLGLActivity.class);
         startActivity(intent);
     }
     public void goToSettings() {
+        bluetooth.disconnectGattServer();
         Intent intent = new Intent(this, SettingActivity.class);
         startActivity(intent);
     }

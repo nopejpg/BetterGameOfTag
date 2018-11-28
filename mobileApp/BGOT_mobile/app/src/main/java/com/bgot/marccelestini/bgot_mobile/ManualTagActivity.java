@@ -42,6 +42,7 @@ public class ManualTagActivity extends AppCompatActivity {
             public void onClick(View v) {
                 bluetooth.sendMessage("EXIT_GAME");
                 Intent intent = new Intent(getApplicationContext(), MainMenuActivity.class);
+                bluetooth.disconnectGattServer();
                 startActivity(intent);
             }
         });
@@ -49,9 +50,9 @@ public class ManualTagActivity extends AppCompatActivity {
         manualTagUpdateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String config1 = manualTagPod1Switch.isChecked() ? "1" : "0";
-                String config2 = manualTagPod2Switch.isChecked() ? "1" : "0";
-                String config3 = manualTagPod3Switch.isChecked() ? "1" : "0";
+                String config1 = manualTagPod1Switch.isChecked() ? "S" : "U";
+                String config2 = manualTagPod2Switch.isChecked() ? "S" : "U";
+                String config3 = manualTagPod3Switch.isChecked() ? "S" : "U";
                 String config = "%" + config1 + config2 + config3;
 
                 bluetooth.sendMessage(config);

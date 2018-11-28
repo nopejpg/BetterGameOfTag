@@ -87,6 +87,12 @@ public class BluetoothServices{
         commsCharacteristic.setValue(messageBytes);
         boolean successfulWrite = mBluetoothGatt.writeCharacteristic(commsCharacteristic);
 
+        if (successfulWrite) {
+            Log.d("BLE","Successfully sent " + mes);
+        } else {
+            Log.e("BLE","Unable to send " + mes);
+        }
+
     }
 
     public void connectAsCentral(String mes) {
@@ -165,8 +171,9 @@ public class BluetoothServices{
             Log.d("BLE Scan", "Name: " +result.getDevice().getName());
             String deviceAddress = result.getDevice().getAddress();
 
-//            if (deviceAddress.equals("20:FA:BB:04:9E:7B") && !connectedToPeripheral) { //<--Marc's BLE
-            if (deviceAddress.equals("20:FA:BB:04:9E:BC")) { //<--Forrest's BLE
+//            if (deviceAddress.equals("20:FA:BB:04:9E:7B")) {
+//            if (deviceAddress.equals("20:FA:BB:04:9E:BC")) {
+                if (deviceAddress.equals("20:FA:BB:04:9E:9B")) {
 
                 Log.d("BLE","Hub discovered, connecting...");
                 mBluetoothGatt = result.getDevice().connectGatt(activity.getApplicationContext(), true, mGattCallback);
@@ -229,7 +236,14 @@ public class BluetoothServices{
             //check for pod statuses
             if (messageString.contains("STAT")) {
                 String status = messageString.substring(5,8);
+                Log.d("SYSTEM", "Received Pod Status: " + status);
                 ((MyApplicationBGOT) activity.getApplication()).setPodStatus(status);
+            }
+
+            if (messageString.contains("ACK")) {
+                Log.d("SYSTEM", "Received ACK");
+                isPendingMessage = false;
+                pendingMessage = "";
             }
         }
 
@@ -265,6 +279,7 @@ public class BluetoothServices{
 
             // if we are reattempting a message send...
             if (isPendingMessage) {
+                Log.d("BLE", "Sending pending message: " + pendingMessage);
                 sendMessage(pendingMessage);
             }
         }

@@ -29,11 +29,12 @@ public class AutomatedTagActivity extends AppCompatActivity {
             }
         });
 
-        autoTagPlayButton.setOnClickListener(new View.OnClickListener() {
+        autoTagQuitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 bluetooth.sendMessage("EXIT_GAME");
                 Intent intent = new Intent(getApplicationContext(), MainMenuActivity.class);
+                bluetooth.disconnectGattServer();
                 startActivity(intent);
             }
         });

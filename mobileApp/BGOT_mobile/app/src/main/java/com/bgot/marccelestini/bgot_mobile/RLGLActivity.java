@@ -40,11 +40,12 @@ public class RLGLActivity extends AppCompatActivity {
             }
         });
 
-        rlglPlayButton.setOnClickListener(new View.OnClickListener() {
+        rlglQuitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 bluetooth.sendMessage("EXIT_GAME");
                 Intent intent = new Intent(getApplicationContext(), MainMenuActivity.class);
+                bluetooth.disconnectGattServer();
                 startActivity(intent);
             }
         });
