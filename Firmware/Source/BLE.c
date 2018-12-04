@@ -656,8 +656,7 @@ static void BLE_changePodStates(void)
 {
 	uint8_t requestedPodStates[3];
 	uint8_t retriesRemaining;
-	uint32_t testingResult = osMessageQueueGet(requestedPodStatesQ_id,&requestedPodStates,NULL,1000);
-	bool connectionResults[3];
+	osMessageQueueGet(requestedPodStatesQ_id,&requestedPodStates,NULL,1000);
 	bool connectionResult;
 
 	if((podInfoList.Pod1_Current_State != requestedPodStates[0]) && (requestedPodStates[0]!=REMAIN_SAME))
@@ -760,13 +759,8 @@ static void BLE_changePodStates(void)
 	}
 
 	osEventFlagsClear(APP_Request_Flags,APP_CHANGE_POD_STATES); //clear APP_CONNECT_TO_POD flag
-	//send APP thread the results from pod state change request (which pods were able to be changed or not)
-	connectionResults[0] = podInfoList.Pod1_Online;
-	connectionResults[1] = podInfoList.Pod2_Online;
-	connectionResults[2] = podInfoList.Pod3_Online;
-	//osMessageQueuePut(podStateRequestResultsQ_id,&connectionResults,NULL,osWaitForever);
 	
-	//TESTING: Send pod statuses to phone after every state change
+	//Send pod statuses to phone after every state change
 	char podStatusMessage[12];
 	sprintf(podStatusMessage,"STAT_%d%d%d",podInfoList.Pod1_Online,podInfoList.Pod2_Online,podInfoList.Pod3_Online);
 	uint8_t packetLength = BLE_BuildPacket(podStatusMessage);

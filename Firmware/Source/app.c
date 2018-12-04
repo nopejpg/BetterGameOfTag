@@ -248,6 +248,7 @@ static void App_playAutomaticTag(void)
 	
 	while(HubState == AUTO_TAG)
 	{
+		Control_RGB_LEDs(0,0,1); //debug LEDs
 		uint32_t result = osEventFlagsWait(APP_Request_Flags, APP_AUTO_TAG_CHANGE_TIMER_EXPIRED|APP_AUTO_TAG_WARNING_TIMER_EXPIRED|APP_MESSAGE_PENDING_FROM_BLE|APP_RESET_TO_MAIN_MENU, NULL, osWaitForever);
 		if(result & APP_MESSAGE_PENDING_FROM_BLE)
 		{
@@ -295,6 +296,7 @@ static void App_playRLGL(void)
 	static uint8_t podStateRequest[3];
 	while(HubState == RL_GL)
 	{
+		Control_RGB_LEDs(0,0,1); //debug LEDs
 		uint32_t result = osEventFlagsWait(APP_Request_Flags, APP_MESSAGE_PENDING_FROM_BLE | APP_RESET_TO_MAIN_MENU, NULL, osWaitForever);
 		if(result & APP_MESSAGE_PENDING_FROM_BLE)
 		{
