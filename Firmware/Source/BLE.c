@@ -419,6 +419,10 @@ static void BLE_handleReceiveFlag_fromPhone(void)
 			//Change from "waiting on response" to "response received" state
 			sBLE.BLE_currentModuleState_forPhone = RESPONSE_RECEIVED;
 		}
+		else if(BLE_searchForKeyword((uint8_t *)"DCN=RMT", queueEntry, &sBLE.rxQueue_fromPhone)) //THIS CASE IS TO HANDLE UNEXPECTED DISCONNECTIONS FROM PHONE
+		{
+			osEventFlagsSet(APP_Request_Flags, APP_RESET_TO_MAIN_MENU);
+		}
 		#endif //IS_HUB_DEVICE
 		
 		//once message has been processed, or if it was not something we care about, clear out that entry

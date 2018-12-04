@@ -7,9 +7,9 @@
 #define GREEN_LED_POS (19)	// on port B
 #define BLUE_LED_POS (1)		// on port D
 
-#define MY_RED_LED_POS (1)  // on port B
+#define MY_RED_LED_POS (3)  // on port B
 #define MY_GREEN_LED_POS (2)  // on port B
-#define MY_BLUE_LED_POS (3)	// on port B
+#define MY_BLUE_LED_POS (1)	// on port B
 
 #define MASK(x) (1UL << (x))
 

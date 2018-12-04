@@ -105,8 +105,12 @@ void Thread_APP_HUB(void *arg)
 	while(1)
 	{
 		Control_RGB_LEDs(0,1,0); //debug LEDs
-		osEventFlagsWait(APP_Request_Flags, APP_MESSAGE_PENDING_FROM_BLE, osFlagsWaitAll, osWaitForever);
-		uint32_t result = osMessageQueueGet(receivedMessageQ_id, &sAPP.rxMessage, NULL, 1000); //wait until command from Phone App is received
+		uint32_t result = osEventFlagsWait(APP_Request_Flags, APP_MESSAGE_PENDING_FROM_BLE|APP_RESET_TO_MAIN_MENU, osFlagsWaitAny, osWaitForever);
+		if(result & APP_RESET_TO_MAIN_MENU) //if BLE thread tells us that phone disconnected from us...
+		{
+			continue;
+		}
+		result = osMessageQueueGet(receivedMessageQ_id, &sAPP.rxMessage, NULL, 1000); //wait until command from Phone App is received
 		if(result == osOK)
 		{
 			osEventFlagsSet(BLE_Flags,BLE_RECEIVED_MESSAGE_TRANSFERRED); //let BLE module know that we are done with it's data, and that it is free to clear it
@@ -167,8 +171,13 @@ static void App_playManualTag(void)
 		uint8_t pod3StateCommand;
 		Control_RGB_LEDs(0,0,1); //debug LEDs
 		
-		osEventFlagsWait(APP_Request_Flags, APP_MESSAGE_PENDING_FROM_BLE, NULL, 1000);
-		uint32_t result = osMessageQueueGet(receivedMessageQ_id, &sAPP.rxMessage, NULL, 1000); //wait until command from Phone App is received
+		uint32_t result = osEventFlagsWait(APP_Request_Flags, APP_MESSAGE_PENDING_FROM_BLE | APP_RESET_TO_MAIN_MENU, NULL, 1000);
+		if((result & APP_RESET_TO_MAIN_MENU)&&(result != osFlagsErrorTimeout)) //if BLE thread tells us that phone disconnected from us...
+		{
+			HubState = HUB_READY; //return to main menu
+			continue;
+		}
+		result = osMessageQueueGet(receivedMessageQ_id, &sAPP.rxMessage, NULL, 1000); //wait until command from Phone App is received
 		if(result == osOK)
 		{
 			osEventFlagsSet(BLE_Flags,BLE_RECEIVED_MESSAGE_TRANSFERRED); //let BLE module know that we are done with it's data, and that it is free to clear it
@@ -239,7 +248,7 @@ static void App_playAutomaticTag(void)
 	
 	while(HubState == AUTO_TAG)
 	{
-		uint32_t result = osEventFlagsWait(APP_Request_Flags, APP_AUTO_TAG_CHANGE_TIMER_EXPIRED|APP_AUTO_TAG_WARNING_TIMER_EXPIRED|APP_MESSAGE_PENDING_FROM_BLE, NULL, osWaitForever);
+		uint32_t result = osEventFlagsWait(APP_Request_Flags, APP_AUTO_TAG_CHANGE_TIMER_EXPIRED|APP_AUTO_TAG_WARNING_TIMER_EXPIRED|APP_MESSAGE_PENDING_FROM_BLE|APP_RESET_TO_MAIN_MENU, NULL, osWaitForever);
 		if(result & APP_MESSAGE_PENDING_FROM_BLE)
 		{
 			uint32_t result = osMessageQueueGet(receivedMessageQ_id, &sAPP.rxMessage, NULL, 1000);
@@ -270,6 +279,10 @@ static void App_playAutomaticTag(void)
 			previousPodStateRequest[2] = podStateRequest[2];
 			App_changePodStates(warningPodStateRequest); //set relevant pods to warning state
 		}
+		else if(result & APP_RESET_TO_MAIN_MENU) //if BLE thread tells us that phone disconnected from us...
+		{
+			HubState = HUB_READY; //return to main menu
+		}
 	}
 }
 
@@ -278,7 +291,7 @@ static void App_playRLGL(void)
 	static uint8_t podStateRequest[3];
 	while(HubState == RL_GL)
 	{
-		uint32_t result = osEventFlagsWait(APP_Request_Flags, APP_MESSAGE_PENDING_FROM_BLE, NULL, osWaitForever);
+		uint32_t result = osEventFlagsWait(APP_Request_Flags, APP_MESSAGE_PENDING_FROM_BLE | APP_RESET_TO_MAIN_MENU, NULL, osWaitForever);
 		if(result & APP_MESSAGE_PENDING_FROM_BLE)
 		{
 			uint32_t result = osMessageQueueGet(receivedMessageQ_id, &sAPP.rxMessage, NULL, 1000);
@@ -312,6 +325,10 @@ static void App_playRLGL(void)
 					HubState = HUB_READY;
 				}
 			}
+		}
+		else if(result & APP_RESET_TO_MAIN_MENU) //if BLE thread tells us that phone disconnected from us...
+		{
+			HubState = HUB_READY; //return to main menu
 		}
 	}
 }
@@ -347,6 +364,7 @@ void Thread_APP_POD(void *arg)
 			{
 				App_SendAck();
 				Control_RGB_LEDs(1,0,0);
+				Control_My_LEDs(1,0,0);
 				Play_Recording(Not_Audio,sizeof(Not_Audio)/sizeof(Not_Audio[0]));
 				osEventFlagsWait(DMA_flags,DMA_REC_COMPLETE, osFlagsWaitAll, osWaitForever);
 				Play_Recording(Safe_Audio,sizeof(Safe_Audio)/sizeof(Safe_Audio[0]));
@@ -356,6 +374,7 @@ void Thread_APP_POD(void *arg)
 			{
 				App_SendAck();
 				Control_RGB_LEDs(0,1,0);
+				Control_My_LEDs(0,1,0);
 				Play_Recording(Safe_Audio,sizeof(Safe_Audio)/sizeof(Safe_Audio[0]));
 				osEventFlagsWait(DMA_flags,DMA_REC_COMPLETE, osFlagsWaitAll, osWaitForever);
 			}
@@ -363,27 +382,32 @@ void Thread_APP_POD(void *arg)
 			{
 				App_SendAck();
 				Control_RGB_LEDs(1,1,0);
+				Control_My_LEDs(1,1,0);
 			}
 			else if(strstr((const char *)sAPP.rxMessage.dataBuffer,"OFF") != NULL) //if WARNING message
 			{
 				App_SendAck();
 				Control_RGB_LEDs(0,0,0);
+				Control_My_LEDs(0,0,0);
 			}
 			else if(strstr((const char *)sAPP.rxMessage.dataBuffer,"RUN") != NULL) //if GO message
 			{
 				App_SendAck();
 				Control_RGB_LEDs(0,1,0);
+				Control_My_LEDs(0,1,0);
 				playGoodNoise();
 			}
 			else if(strstr((const char *)sAPP.rxMessage.dataBuffer,"WALK") != NULL) //if GO message
 			{
 				App_SendAck();
 				Control_RGB_LEDs(1,1,0);
+				Control_My_LEDs(1,1,0);
 			}
 			else if(strstr((const char *)sAPP.rxMessage.dataBuffer,"STOP") != NULL) //if STOP message
 			{
 				App_SendAck();
 				Control_RGB_LEDs(1,0,0);
+				Control_My_LEDs(1,0,0);
 				playBadNoise();
 			}
 		}
