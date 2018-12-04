@@ -90,7 +90,17 @@ public class BluetoothServices{
         if (successfulWrite) {
             Log.d("BLE","Successfully sent " + mes);
         } else {
-            Log.e("BLE","Unable to send " + mes);
+            Log.e("BLE","Unable to send " + mes + ". Retrying...");
+            try {
+                disconnectGattServer();
+                Log.d("BLE","waiting to retry");
+                Thread.sleep(2000);
+                connectAsCentral(mes);
+
+            } catch (InterruptedException ie) {
+                Log.e("sleep","Failed thread sleep");
+            }
+
         }
 
     }

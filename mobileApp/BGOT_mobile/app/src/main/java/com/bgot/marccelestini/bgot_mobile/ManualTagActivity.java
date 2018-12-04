@@ -34,6 +34,7 @@ public class ManualTagActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 bluetooth.sendMessage("MAN_TAG");
+
             }
         });
 
