@@ -2,7 +2,6 @@ package com.bgot.marccelestini.bgot_mobile;
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.IntentService;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCallback;
@@ -16,11 +15,11 @@ import android.bluetooth.le.ScanResult;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
-import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.content.Intent;
 import android.os.AsyncTask;
+
 import java.util.Arrays;
 import java.util.UUID;
 import java.io.*;
@@ -33,9 +32,10 @@ public class BluetoothServices{
     private BluetoothGatt mBluetoothGatt;
     private BluetoothLeScanner btScanner;
     boolean scanning = false;
-    boolean commsReady = false;
-    boolean isPendingMessage = false;
-    String pendingMessage = null;
+    public volatile boolean commsReady = false;
+    protected Activity activity;
+    private BluetoothServicesListener listener;
+    boolean lastMessageAcked = false;
 
     UUID communicationServiceUUID = UARTProfile.msService1;
     UUID communicationCharacteristic = UARTProfile.msService1Characteristic1;
@@ -44,17 +44,25 @@ public class BluetoothServices{
     private final static int REQUEST_ENABLE_BT = 1;
     private static final int PERMISSION_REQUEST_COARSE_LOCATION = 1;
 
-    protected Activity activity;
+    public interface BluetoothServicesListener {
+        public void onCommsReady();
+    }
+
+    public void setBluetoothServicesListener(BluetoothServicesListener listener) {
+        this.listener = listener;
+    }
 
     public BluetoothServices(Activity activity) {
         // grab the correct activity
         this.activity = activity;
+        this.listener = null;
         if (!commsReady) {
-            connectAsCentral(null);
+            disconnectGattServer();
+            connectAsCentral();
         }
     }
 
-    public void sendMessage(String mes) {
+    public String sendMessage(String mes) {
         //Check for correct messages only
         String[] messages = {
                 "MAN_TAG","AUTOMATE_TAG","RL_GL","EXIT_GAME",
@@ -65,14 +73,13 @@ public class BluetoothServices{
 
         if (!Arrays.asList(messages).contains(mes)) {
             Log.e("ERR","Invalid message " + mes);
-            return;
+            return "invalidMessage";
         }
 
         if (!commsReady) {
             disconnectGattServer();
-            Log.d("BLE","Not connected to hub, attempting reconnect...");
-            connectAsCentral(mes);
-            return;
+            Log.d("BLE","Not connected to hub, exiting to main menu");
+            return "notConnected";
         }
 
         String message = UARTProfile.createPacket(mes);
@@ -89,29 +96,16 @@ public class BluetoothServices{
 
         if (successfulWrite) {
             Log.d("BLE","Successfully sent " + mes);
+            lastMessageAcked = false;
+            return "sent";
         } else {
-            Log.e("BLE","Unable to send " + mes + ". Retrying...");
-            try {
-                disconnectGattServer();
-                Log.d("BLE","waiting to retry");
-                Thread.sleep(2000);
-                connectAsCentral(mes);
-
-            } catch (InterruptedException ie) {
-                Log.e("sleep","Failed thread sleep");
-            }
-
+            Log.e("BLE","Unable to send " + mes);
+            return "notSent";
         }
 
     }
 
-    public void connectAsCentral(String mes) {
-        // check to see if we have a message to send upon connection
-        if (mes != null && !mes.isEmpty()) {
-            Log.d("BLE","Storing message " + mes);
-            isPendingMessage = true;
-            pendingMessage = mes;
-        }
+    public void connectAsCentral(){
 
         final BluetoothManager bluetoothManager = (BluetoothManager) activity.getSystemService(Context.BLUETOOTH_SERVICE);
         mBluetoothAdapter = bluetoothManager.getAdapter();
@@ -181,9 +175,8 @@ public class BluetoothServices{
             Log.d("BLE Scan", "Name: " +result.getDevice().getName());
             String deviceAddress = result.getDevice().getAddress();
 
-//            if (deviceAddress.equals("20:FA:BB:04:9E:7B")) {
-//            if (deviceAddress.equals("20:FA:BB:04:9E:BC")) {
-                if (deviceAddress.equals("20:FA:BB:04:9E:9B")) {
+//                if (deviceAddress.equals("20:FA:BB:04:9E:9B")) { // <-- testing
+                if (deviceAddress.equals("20:FA:BB:04:9E:B4")) { // <-- the actual hub
 
                 Log.d("BLE","Hub discovered, connecting...");
                 mBluetoothGatt = result.getDevice().connectGatt(activity.getApplicationContext(), true, mGattCallback);
@@ -252,8 +245,7 @@ public class BluetoothServices{
 
             if (messageString.contains("ACK")) {
                 Log.d("SYSTEM", "Received ACK");
-                isPendingMessage = false;
-                pendingMessage = "";
+                lastMessageAcked = true;
             }
         }
 
@@ -287,11 +279,8 @@ public class BluetoothServices{
             commsReady = gatt.setCharacteristicNotification(commsCharacteristic, true);
             Log.d("BLE","Communications service is ready");
 
-            // if we are reattempting a message send...
-            if (isPendingMessage) {
-                Log.d("BLE", "Sending pending message: " + pendingMessage);
-                sendMessage(pendingMessage);
-            }
+            //update listener if it exists
+            if (listener != null) listener.onCommsReady();
         }
     };
 
