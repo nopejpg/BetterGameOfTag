@@ -252,10 +252,14 @@ static void App_playAutomaticTag(void)
 		if(result & APP_MESSAGE_PENDING_FROM_BLE)
 		{
 			uint32_t result = osMessageQueueGet(receivedMessageQ_id, &sAPP.rxMessage, NULL, 1000);
-			if(strstr((const char *)sAPP.rxMessage.dataBuffer,"EXIT_GAME") != NULL)
+			if(result == osOK)
 			{
-				App_SendAck();
-				HubState = HUB_READY;
+				osEventFlagsSet(BLE_Flags,BLE_RECEIVED_MESSAGE_TRANSFERRED); //let BLE module know that we are done with it's data, and that it is free to clear it
+				if(strstr((const char *)sAPP.rxMessage.dataBuffer,"EXIT_GAME") != NULL)
+				{
+					App_SendAck();
+					HubState = HUB_READY;
+				}
 			}
 		}
 		else if(result & APP_AUTO_TAG_CHANGE_TIMER_EXPIRED) //when time for new states, randomize and change to new states
@@ -300,6 +304,7 @@ static void App_playRLGL(void)
 				osEventFlagsSet(BLE_Flags,BLE_RECEIVED_MESSAGE_TRANSFERRED); //let BLE module know that we are done with it's data, and that it is free to clear it
 				if(strstr((const char *)sAPP.rxMessage.dataBuffer,"RUN") != NULL)
 				{
+					App_SendAck();
 					Util_copyMemory((uint8_t[]){OFF, OFF, OFF}, podStateRequest, 3); //turn off all pods
 					App_changePodStates(podStateRequest);
 					podStateRequest[0] = RUN; 
@@ -307,6 +312,7 @@ static void App_playRLGL(void)
 				}
 				else if(strstr((const char *)sAPP.rxMessage.dataBuffer,"WALK") != NULL)
 				{
+					App_SendAck();
 					Util_copyMemory((uint8_t[]){OFF, OFF, OFF}, podStateRequest, 3);
 					App_changePodStates(podStateRequest);
 					podStateRequest[1] = WALK;
@@ -314,6 +320,7 @@ static void App_playRLGL(void)
 				}
 				else if(strstr((const char *)sAPP.rxMessage.dataBuffer,"STOP") != NULL)
 				{
+					App_SendAck();
 					Util_copyMemory((uint8_t[]){OFF, OFF, OFF}, podStateRequest, 3);
 					App_changePodStates(podStateRequest);
 					podStateRequest[2] = STOP;
