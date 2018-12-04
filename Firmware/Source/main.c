@@ -39,6 +39,7 @@ int main (void) {
 	Init_DMA_For_Playback();
 	Init_DAC();
 	Init_RGB_LEDs();
+	Init_My_LEDs();
 	Control_RGB_LEDs(0,0,0);
 	
   osKernelInitialize();                 // Initialize CMSIS-RTOS

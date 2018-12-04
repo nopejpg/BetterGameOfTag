@@ -98,7 +98,7 @@ void Thread_APP_HUB(void *arg)
 	
 	HubState = PODS_AWAITING_CONNECTION;
 
-	App_waitForPods(); //on power up, make sure all pods are online before proceeding
+	//App_waitForPods(); //on power up, make sure all pods are online before proceeding
 	
 	HubState = HUB_READY;
 	
@@ -210,6 +210,8 @@ static void App_playManualTag(void)
 			else if(strstr((const char *)sAPP.rxMessage.dataBuffer,"EXIT_GAME") != NULL)
 			{
 				App_SendAck();
+				Util_copyMemory((uint8_t[]){OFF, OFF, OFF}, podStateRequest, 3); //turn off pods before going to main menu
+				App_changePodStates(podStateRequest);
 				HubState = HUB_READY;
 			}
 		}
@@ -259,6 +261,8 @@ static void App_playAutomaticTag(void)
 				if(strstr((const char *)sAPP.rxMessage.dataBuffer,"EXIT_GAME") != NULL)
 				{
 					App_SendAck();
+					Util_copyMemory((uint8_t[]){OFF, OFF, OFF}, podStateRequest, 3); //turn off pods before going to main menu
+					App_changePodStates(podStateRequest);
 					HubState = HUB_READY;
 				}
 			}
@@ -286,6 +290,8 @@ static void App_playAutomaticTag(void)
 		}
 		else if(result & APP_RESET_TO_MAIN_MENU) //if BLE thread tells us that phone disconnected from us...
 		{
+			Util_copyMemory((uint8_t[]){OFF, OFF, OFF}, podStateRequest, 3); //turn off pods before going to main menu
+			App_changePodStates(podStateRequest);
 			HubState = HUB_READY; //return to main menu
 		}
 	}
@@ -331,12 +337,16 @@ static void App_playRLGL(void)
 				else if(strstr((const char *)sAPP.rxMessage.dataBuffer,"EXIT_GAME") != NULL)
 				{
 					App_SendAck();
+					Util_copyMemory((uint8_t[]){OFF, OFF, OFF}, podStateRequest, 3); //turn off pods before going to main menu
+					App_changePodStates(podStateRequest);
 					HubState = HUB_READY;
 				}
 			}
 		}
 		else if(result & APP_RESET_TO_MAIN_MENU) //if BLE thread tells us that phone disconnected from us...
 		{
+			Util_copyMemory((uint8_t[]){OFF, OFF, OFF}, podStateRequest, 3); //turn off pods before going to main menu
+			App_changePodStates(podStateRequest);
 			HubState = HUB_READY; //return to main menu
 		}
 	}

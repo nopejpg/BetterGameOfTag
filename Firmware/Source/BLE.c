@@ -116,9 +116,11 @@ void BLE_init(void)
 	sBLE.phoneConnected = false;
 	sBLE.podConnected = false;
 	BLE_Flags = osEventFlagsNew(NULL);
+	osDelay(2000); //give system a couple of seconds before sending command to pods.
   UART0_init(9600,&BLE_handleUARTCB_forPhone);
 	#ifdef IS_HUB_DEVICE
 	UART1_init(9600,&BLE_handleUARTCB_forPods);
+	osDelay(3000); //give system a couple of seconds before sending command to pods.
 	BLE_initBLE_forPods();
 	#endif //IS_HUB_DEVICE
 	BLE_initBLE_forPhone();
