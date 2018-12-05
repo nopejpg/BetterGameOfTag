@@ -6,6 +6,8 @@
 #include "utilities.h"
 #include "app.h"
 
+#include "LEDs.h"
+
 osEventFlagsId_t BLE_Flags;
 
 
@@ -543,6 +545,7 @@ static void BLE_SendCommand(const char *pString)
 			BLE_SendPacket(packetLength, SEND_TO_POD);
 			sBLE.BLE_currentCommsState_forPods = AWAITING_ACK;
 			
+			
 			startingTickCount = osKernelGetTickCount();
 			do
 			{
@@ -605,15 +608,13 @@ static bool BLE_connectToDevice(const char *pBTAddress)
 {
 	bool result = false;
 	
-	if(sBLE.podConnected)
-		BLE_disconnectFromDevice();
-	
 	sBLE.BLE_currentModuleState_forPods = SENDING_COMMAND;
 	BLE_Send((uint8_t *)"CON ", 4, SEND_TO_POD);
 	BLE_Send((uint8_t *)pBTAddress, BLE_ADDRESS_LENGTH, SEND_TO_POD);
 	BLE_Send((uint8_t *)" 0\r", 3, SEND_TO_POD);
 	sBLE.BLE_currentModuleState_forPods = AWAITING_RESPONSE;
 	osDelay(500); //wait to give connection time to establish
+	osEventFlagsClear(BLE_Flags,BLE_MESSAGE_RECEIVED_FROM_PODS); //TESTING. Clear before we issue the STS command.
 	result = BLE_isDeviceConnected();
 	return result; //true if we successfully connected, else false
 }
@@ -623,7 +624,7 @@ static bool BLE_isDeviceConnected(void) //used for pods only
 	sBLE.BLE_currentModuleState_forPods = SENDING_COMMAND;
 	BLE_Send((uint8_t *)"STS\r", 4, SEND_TO_POD);
 	sBLE.BLE_currentModuleState_forPods = AWAITING_RESPONSE;
-	osDelay(100); //Give time for all messages to come in so we can process them all at once. TESTING: WAS 500
+	osDelay(200); //Give time for all messages to come in so we can process them all at once. TESTING: WAS 500, then 100
 	uint32_t events = osEventFlagsWait(BLE_Flags,BLE_MESSAGE_RECEIVED_FROM_PODS,osFlagsWaitAll,osWaitForever);
 	BLE_handleReceiveFlag_fromPods();
 	
@@ -637,6 +638,7 @@ static bool BLE_isDeviceConnected(void) //used for pods only
 	}
 	else
 	{
+		sBLE.podConnected = false;
 		return false;
 	}
 }
@@ -661,7 +663,8 @@ static void BLE_changePodStates(void)
 	osMessageQueueGet(requestedPodStatesQ_id,&requestedPodStates,NULL,1000);
 	bool connectionResult;
 
-	if((podInfoList.Pod1_Current_State != requestedPodStates[0]) && (requestedPodStates[0]!=REMAIN_SAME))
+	connectionResult = false;
+	if((podInfoList.Pod1_Current_State != requestedPodStates[0]) && (requestedPodStates[0]!=REMAIN_SAME) && (podInfoList.Pod1_Online == true))
 	{
 		retriesRemaining = 5;
 		do
@@ -693,8 +696,11 @@ static void BLE_changePodStates(void)
 			podInfoList.Pod1_Online = false;
 		}
 	}
+	if(sBLE.podConnected)
+		BLE_disconnectFromDevice();
 	
-	if((podInfoList.Pod2_Current_State != requestedPodStates[1]) && (requestedPodStates[1]!=REMAIN_SAME))
+	connectionResult = false;
+	if((podInfoList.Pod2_Current_State != requestedPodStates[1]) && (requestedPodStates[1]!=REMAIN_SAME) && (podInfoList.Pod2_Online == true))
 	{
 		retriesRemaining = 5;
 		do
@@ -724,10 +730,14 @@ static void BLE_changePodStates(void)
 		else //indicate that pod is offline
 		{
 			podInfoList.Pod2_Online = false;
+			BLE_issueResetCommand(PODS_BLE); //Trying to connect to a pod that is offline puts module into bad state. If all retries fail, then reset module and move on.
 		}
 	}
+	if(sBLE.podConnected)
+		BLE_disconnectFromDevice();
 	
-	if((podInfoList.Pod3_Current_State != requestedPodStates[2]) && (requestedPodStates[2]!=REMAIN_SAME))
+	connectionResult = false;
+	if((podInfoList.Pod3_Current_State != requestedPodStates[2]) && (requestedPodStates[2]!=REMAIN_SAME) && (podInfoList.Pod3_Online == true))
 	{
 		retriesRemaining = 5;
 		do
@@ -758,8 +768,11 @@ static void BLE_changePodStates(void)
 		{
 			podInfoList.Pod3_Online = false;
 		}
+		if(sBLE.podConnected)
+			BLE_disconnectFromDevice();
 	}
 
+	Control_RGB_LEDs(0,0,0); //TESTING
 	osEventFlagsClear(APP_Request_Flags,APP_CHANGE_POD_STATES); //clear APP_CONNECT_TO_POD flag
 	
 	//Send pod statuses to phone after every state change
