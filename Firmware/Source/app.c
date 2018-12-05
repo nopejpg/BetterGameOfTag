@@ -32,8 +32,6 @@ static enum
 }HubState;
 
 
-static bool currentPodStatuses[3];
-
 #endif //IS_HUB_DEVICE
 
 
@@ -435,7 +433,7 @@ void Thread_APP_POD(void *arg)
 
 void playBadNoise(void)
 {
-	for(uint16_t i=0;i<143;i++) //each segment is ~0.014s long, so need to play ~143 times to get 2s work of sound
+	for(uint16_t i=0;i<35;i++) //each segment is ~0.014s long, so need to play ~35 times to get 0.5s worth of sound
 	{
 		Play_Recording(BadNoise,sizeof(BadNoise)/sizeof(BadNoise[0]));
 		osEventFlagsWait(DMA_flags,DMA_REC_COMPLETE, osFlagsWaitAll, osWaitForever);
@@ -444,7 +442,7 @@ void playBadNoise(void)
 
 void playGoodNoise(void)
 {
-	for(uint16_t i=0;i<100;i++) //each segment is ~0.02s long, so need to play ~100 times to get 2s work of sound
+	for(uint16_t i=0;i<1;i++) //each segment is ~0.465s long, so need to play ~1 times to get 0.5s worth of sound
 	{
 		Play_Recording(GoodNoise,sizeof(GoodNoise)/sizeof(GoodNoise[0]));
 		osEventFlagsWait(DMA_flags,DMA_REC_COMPLETE, osFlagsWaitAll, osWaitForever);
