@@ -147,21 +147,69 @@
         <Bp>
           <Number>0</Number>
           <Type>0</Type>
-          <LineNumber>366</LineNumber>
+          <LineNumber>78</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>13090</Address>
+          <Address>12116</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>1</BreakIfRCount>
-          <Filename>.\Source\app.c</Filename>
+          <Filename>.\Source\LEDs.c</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\Better_Game_Of_Tag\Source/app.c\366</Expression>
+          <Expression>\\Better_Game_Of_Tag\Source/LEDs.c\78</Expression>
         </Bp>
         <Bp>
           <Number>1</Number>
+          <Type>0</Type>
+          <LineNumber>87</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>0</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>0</BreakIfRCount>
+          <Filename>.\Source\LEDs.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression></Expression>
+        </Bp>
+        <Bp>
+          <Number>2</Number>
+          <Type>0</Type>
+          <LineNumber>88</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>0</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>0</BreakIfRCount>
+          <Filename>.\Source\LEDs.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression></Expression>
+        </Bp>
+        <Bp>
+          <Number>3</Number>
+          <Type>0</Type>
+          <LineNumber>366</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>0</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>0</BreakIfRCount>
+          <Filename>.\Source\app.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression></Expression>
+        </Bp>
+        <Bp>
+          <Number>4</Number>
           <Type>0</Type>
           <LineNumber>374</LineNumber>
           <EnabledFlag>1</EnabledFlag>
@@ -246,7 +294,11 @@
       <pMultCmdsp></pMultCmdsp>
       <SystemViewers>
         <Entry>
-          <Name>System Viewer\GPIOB</Name>
+          <Name>System Viewer\SIM</Name>
+          <WinId>35904</WinId>
+        </Entry>
+        <Entry>
+          <Name>System Viewer\TPM1</Name>
           <WinId>35905</WinId>
         </Entry>
       </SystemViewers>

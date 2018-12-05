@@ -39,7 +39,10 @@ int main (void) {
 	Init_DMA_For_Playback();
 	Init_DAC();
 	Init_RGB_LEDs();
-	Init_My_LEDs();
+	//Init_My_LEDs(48000);
+	Init_My_Red_LED();
+	Init_My_Green_LED_PWM(TPM_PERIOD);
+	Init_My_Blue_LED();
 	Control_RGB_LEDs(0,0,0);
 	
   osKernelInitialize();                 // Initialize CMSIS-RTOS
