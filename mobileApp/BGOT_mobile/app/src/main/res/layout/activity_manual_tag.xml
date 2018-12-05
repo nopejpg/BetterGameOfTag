@@ -93,8 +93,9 @@
         android:textOff="Unsafe"
         android:textOn="Safe"
         android:textSize="30sp"
+        android:textStyle="bold"
         android:thumbTint="@android:color/holo_blue_dark"
-        android:trackTint="@android:color/holo_blue_light"
+        android:trackTint="@android:color/transparent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/manualTagPod2Switch" />
 
@@ -108,8 +109,9 @@
         android:textOff="Unsafe"
         android:textOn="Safe"
         android:textSize="30sp"
+        android:textStyle="bold"
         android:thumbTint="@android:color/holo_blue_dark"
-        android:trackTint="@android:color/holo_blue_light"
+        android:trackTint="@android:color/transparent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/manualTagPod1Switch" />
 
@@ -123,15 +125,16 @@
         android:textOff="Unsafe"
         android:textOn="Safe"
         android:textSize="30sp"
+        android:textStyle="bold"
         android:thumbTint="@android:color/holo_blue_dark"
-        android:trackTint="@android:color/holo_blue_light"
+        android:trackTint="@android:color/transparent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/manualTagHeader" />
 
     <Button
         android:id="@+id/manualTagUpdateButton"
-        android:layout_width="233dp"
-        android:layout_height="wrap_content"
+        android:layout_width="255dp"
+        android:layout_height="67dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="52dp"

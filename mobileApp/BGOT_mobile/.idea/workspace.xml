@@ -48,18 +48,10 @@
       <file leaf-file-name="BluetoothServices.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/src/main/java/com/bgot/marccelestini/bgot_mobile/BluetoothServices.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="4016">
+            <state relative-caret-position="0">
               <caret line="282" column="58" lean-forward="false" selection-start-line="282" selection-start-column="58" selection-end-line="282" selection-end-column="58" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="e#4709#5015#0" expanded="true" />
-                <element signature="e#5014#5015#0" expanded="true" />
-                <element signature="e#5083#5313#0" expanded="true" />
-                <element signature="e#5312#5313#0" expanded="true" />
-                <element signature="e#6484#7330#0" expanded="true" />
-                <element signature="e#7329#7330#0" expanded="true" />
-                <element signature="e#7393#7622#0" expanded="true" />
-                <element signature="e#7621#7622#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -68,51 +60,37 @@
       <file leaf-file-name="AutomatedTagActivity.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/src/main/java/com/bgot/marccelestini/bgot_mobile/AutomatedTagActivity.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="225">
-              <caret line="15" column="4" lean-forward="false" selection-start-line="15" selection-start-column="4" selection-end-line="16" selection-end-column="38" />
+            <state relative-caret-position="227">
+              <caret line="23" column="37" lean-forward="false" selection-start-line="23" selection-start-column="37" selection-end-line="23" selection-end-column="37" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="e#1069#1740#0" expanded="true" />
-                <element signature="e#1262#1696#0" expanded="true" />
-                <element signature="e#1695#1696#0" expanded="true" />
-                <element signature="e#1739#1740#0" expanded="true" />
-                <element signature="e#1789#2045#0" expanded="true" />
-                <element signature="e#2044#2045#0" expanded="true" />
-                <element signature="e#2094#2343#0" expanded="true" />
-                <element signature="e#2342#2343#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ManualTagActivity.java" pinned="false" current-in-tab="false">
+      <file leaf-file-name="ManualTagActivity.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/app/src/main/java/com/bgot/marccelestini/bgot_mobile/ManualTagActivity.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="124">
-              <caret line="90" column="4" lean-forward="false" selection-start-line="90" selection-start-column="4" selection-end-line="133" selection-end-column="5" />
+            <state relative-caret-position="362">
+              <caret line="57" column="11" lean-forward="true" selection-start-line="57" selection-start-column="11" selection-end-line="57" selection-end-column="11" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="e#1627#2370#0" expanded="true" />
-                <element signature="e#1820#2326#0" expanded="true" />
-                <element signature="e#2325#2326#0" expanded="true" />
-                <element signature="e#2369#2370#0" expanded="true" />
-                <element signature="e#2719#2968#0" expanded="true" />
-                <element signature="e#2967#2968#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="RLGLActivity.java" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/bgot/marccelestini/bgot_mobile/RLGLActivity.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="193">
-              <caret line="96" column="46" lean-forward="true" selection-start-line="96" selection-start-column="46" selection-end-line="96" selection-end-column="46" />
-              <folding>
-                <element signature="e#1607#1856#0" expanded="true" />
-                <element signature="e#1855#1856#0" expanded="true" />
-              </folding>
+      <file leaf-file-name="activity_setting.xml" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/activity_setting.xml">
+          <provider editor-type-id="text-editor">
+            <state relative-caret-position="180">
+              <caret line="12" column="8" lean-forward="false" selection-start-line="12" selection-start-column="8" selection-end-line="12" selection-end-column="8" />
+              <folding />
             </state>
+          </provider>
+          <provider selected="true" editor-type-id="android-designer2">
+            <state />
           </provider>
         </entry>
       </file>
@@ -2183,16 +2161,16 @@
         <option value="$PROJECT_DIR$/app/src/main/AndroidManifest.xml" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/bgot/marccelestini/bgot_mobile/MyApplicationBGOT.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/bgot/marccelestini/bgot_mobile/MainMenuActivity.java" />
-        <option value="$PROJECT_DIR$/app/src/main/res/layout/activity_setting.xml" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/bgot/marccelestini/bgot_mobile/SettingActivity.java" />
-        <option value="$PROJECT_DIR$/app/src/main/res/layout/activity_automated_tag.xml" />
         <option value="$PROJECT_DIR$/app/src/main/res/layout/activity_rlgl.xml" />
-        <option value="$PROJECT_DIR$/app/src/main/res/layout/activity_manual_tag.xml" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/bgot/marccelestini/bgot_mobile/BLEException.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/bgot/marccelestini/bgot_mobile/BluetoothServices.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/bgot/marccelestini/bgot_mobile/AutomatedTagActivity.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/bgot/marccelestini/bgot_mobile/ManualTagActivity.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/bgot/marccelestini/bgot_mobile/RLGLActivity.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/bgot/marccelestini/bgot_mobile/AutomatedTagActivity.java" />
+        <option value="$PROJECT_DIR$/app/src/main/res/layout/activity_manual_tag.xml" />
+        <option value="$PROJECT_DIR$/app/src/main/res/layout/activity_automated_tag.xml" />
+        <option value="$PROJECT_DIR$/app/src/main/res/layout/activity_setting.xml" />
       </list>
     </option>
   </component>
@@ -2225,13 +2203,19 @@
             <path>
               <item name="BGOT_mobile" type="1abcf292:AndroidViewProjectNode" />
               <item name="app" type="feadf853:AndroidModuleNode" />
-              <item name="java" type="edd41e36:AndroidSourceTypeNode" />
+              <item name="res" type="d4f16f75:AndroidResFolderNode" />
             </path>
             <path>
               <item name="BGOT_mobile" type="1abcf292:AndroidViewProjectNode" />
               <item name="app" type="feadf853:AndroidModuleNode" />
-              <item name="java" type="edd41e36:AndroidSourceTypeNode" />
-              <item name="bgot_mobile" type="cbb59c9e:AndroidPsiDirectoryNode" />
+              <item name="res" type="d4f16f75:AndroidResFolderNode" />
+              <item name="drawable" type="ddeffd01:AndroidResFolderTypeNode" />
+            </path>
+            <path>
+              <item name="BGOT_mobile" type="1abcf292:AndroidViewProjectNode" />
+              <item name="app" type="feadf853:AndroidModuleNode" />
+              <item name="res" type="d4f16f75:AndroidResFolderNode" />
+              <item name="layout" type="ddeffd01:AndroidResFolderTypeNode" />
             </path>
             <path>
               <item name="BGOT_mobile" type="1abcf292:AndroidViewProjectNode" />
@@ -2241,10 +2225,10 @@
           <select />
         </subPane>
       </pane>
-      <pane id="Scratches" />
-      <pane id="Scope" />
-      <pane id="ProjectPane" />
       <pane id="PackagesPane" />
+      <pane id="Scratches" />
+      <pane id="ProjectPane" />
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -2430,14 +2414,16 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1440" height="900" extended-state="0" />
+    <editor active="true" />
     <layout>
-      <window_info id="Android Profiler" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.49702823" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Android Profiler" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="false" weight="0.33" sideWeight="0.49702823" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Palette&#9;" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Image Layers" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Build Variants" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.27932286" sideWeight="0.36194563" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32769045" sideWeight="0.6380544" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.49702823" order="7" side_tool="false" content_ui="tabs" />
@@ -2445,7 +2431,7 @@
       <window_info id="Captures" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3311874" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3304721" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Build" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32769045" sideWeight="0.45636624" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Gradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32986626" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24964234" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
@@ -2459,7 +2445,6 @@
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
     </layout>
   </component>
@@ -2528,14 +2513,6 @@
           <caret line="173" column="66" lean-forward="false" selection-start-line="173" selection-start-column="46" selection-end-line="173" selection-end-column="66" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#4709#5015#0" expanded="true" />
-            <element signature="e#5014#5015#0" expanded="true" />
-            <element signature="e#5083#5313#0" expanded="true" />
-            <element signature="e#5312#5313#0" expanded="true" />
-            <element signature="e#6484#7330#0" expanded="true" />
-            <element signature="e#7329#7330#0" expanded="true" />
-            <element signature="e#7393#7622#0" expanded="true" />
-            <element signature="e#7621#7622#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -2562,14 +2539,6 @@
           <caret line="234" column="10" lean-forward="true" selection-start-line="234" selection-start-column="10" selection-end-line="234" selection-end-column="10" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#4709#5015#0" expanded="true" />
-            <element signature="e#5014#5015#0" expanded="true" />
-            <element signature="e#5083#5313#0" expanded="true" />
-            <element signature="e#5312#5313#0" expanded="true" />
-            <element signature="e#6484#7330#0" expanded="true" />
-            <element signature="e#7329#7330#0" expanded="true" />
-            <element signature="e#7393#7622#0" expanded="true" />
-            <element signature="e#7621#7622#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -2596,14 +2565,6 @@
           <caret line="89" column="31" lean-forward="false" selection-start-line="89" selection-start-column="31" selection-end-line="89" selection-end-column="31" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#4709#5015#0" expanded="true" />
-            <element signature="e#5014#5015#0" expanded="true" />
-            <element signature="e#5083#5313#0" expanded="true" />
-            <element signature="e#5312#5313#0" expanded="true" />
-            <element signature="e#6484#7330#0" expanded="true" />
-            <element signature="e#7329#7330#0" expanded="true" />
-            <element signature="e#7393#7622#0" expanded="true" />
-            <element signature="e#7621#7622#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -2638,14 +2599,6 @@
           <caret line="89" column="31" lean-forward="true" selection-start-line="89" selection-start-column="31" selection-end-line="89" selection-end-column="31" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#4709#5015#0" expanded="true" />
-            <element signature="e#5014#5015#0" expanded="true" />
-            <element signature="e#5083#5313#0" expanded="true" />
-            <element signature="e#5312#5313#0" expanded="true" />
-            <element signature="e#6484#7330#0" expanded="true" />
-            <element signature="e#7329#7330#0" expanded="true" />
-            <element signature="e#7393#7622#0" expanded="true" />
-            <element signature="e#7621#7622#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -2664,14 +2617,6 @@
           <caret line="119" column="45" lean-forward="false" selection-start-line="119" selection-start-column="45" selection-end-line="119" selection-end-column="45" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#4709#5015#0" expanded="true" />
-            <element signature="e#5014#5015#0" expanded="true" />
-            <element signature="e#5083#5313#0" expanded="true" />
-            <element signature="e#5312#5313#0" expanded="true" />
-            <element signature="e#6484#7330#0" expanded="true" />
-            <element signature="e#7329#7330#0" expanded="true" />
-            <element signature="e#7393#7622#0" expanded="true" />
-            <element signature="e#7621#7622#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -2800,27 +2745,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/activity_setting.xml">
-      <provider editor-type-id="text-editor">
-        <state relative-caret-position="180">
-          <caret line="12" column="8" lean-forward="false" selection-start-line="12" selection-start-column="8" selection-end-line="12" selection-end-column="8" />
-        </state>
-      </provider>
-      <provider selected="true" editor-type-id="android-designer2">
-        <state />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/activity_automated_tag.xml">
-      <provider editor-type-id="text-editor">
-        <state relative-caret-position="210">
-          <caret line="14" column="39" lean-forward="false" selection-start-line="14" selection-start-column="39" selection-end-line="14" selection-end-column="39" />
-          <folding />
-        </state>
-      </provider>
-      <provider selected="true" editor-type-id="android-designer2">
-        <state />
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/activity_rlgl.xml">
       <provider editor-type-id="text-editor">
         <state relative-caret-position="1155">
@@ -2840,123 +2764,11 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/activity_manual_tag.xml">
-      <provider editor-type-id="text-editor">
-        <state relative-caret-position="1440">
-          <caret line="96" column="58" lean-forward="false" selection-start-line="96" selection-start-column="58" selection-end-line="96" selection-end-column="58" />
-          <folding />
-        </state>
-      </provider>
-      <provider selected="true" editor-type-id="android-designer2">
-        <state />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/bgot/marccelestini/bgot_mobile/BLEException.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="90">
-          <caret line="6" column="16" lean-forward="false" selection-start-line="6" selection-start-column="16" selection-end-line="6" selection-end-column="16" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/bgot/marccelestini/bgot_mobile/BLEException.java" />
     <entry file="jar://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/support-fragment-28.0.0.aar/35fd111b1a552500d33fe183ed284d67/jars/classes.jar!/android/support/v4/app/FragmentActivity.class">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="462">
           <caret line="312" column="11" lean-forward="false" selection-start-line="312" selection-start-column="11" selection-end-line="312" selection-end-column="11" />
-          <folding>
-            <marker date="1537891573530" expanded="false" signature="0:104" ph="/.../" />
-            <marker date="1537891573530" expanded="false" signature="146:1502" ph="..." />
-            <marker date="1537891573530" expanded="false" signature="2221:2285" ph="handleMessage(msg) → {" />
-            <marker date="1537891573530" expanded="false" signature="2572:2583" ph="}" />
-            <marker date="1537891573530" expanded="true" signature="3084:3091" ph="{}" />
-            <marker date="1537891573530" expanded="true" signature="3185:4341" ph="{...}" />
-            <marker date="1537891573530" expanded="true" signature="4375:4725" ph="{...}" />
-            <marker date="1537891573530" expanded="false" signature="4773:4784" ph=" { " />
-            <marker date="1537891573530" expanded="false" signature="4827:4833" ph=" }" />
-            <marker date="1537891573530" expanded="true" signature="4913:4990" ph="{...}" />
-            <marker date="1537891573530" expanded="true" signature="5069:5145" ph="{...}" />
-            <marker date="1537891573530" expanded="false" signature="5195:5206" ph=" { " />
-            <marker date="1537891573530" expanded="false" signature="5251:5257" ph=" }" />
-            <marker date="1537891573530" expanded="true" signature="5314:5381" ph="{...}" />
-            <marker date="1537891573530" expanded="true" signature="5468:5552" ph="{...}" />
-            <marker date="1537891573530" expanded="true" signature="5649:5743" ph="{...}" />
-            <marker date="1537891573530" expanded="true" signature="5809:5975" ph="{...}" />
-            <marker date="1537891573530" expanded="true" signature="6036:6778" ph="{...}" />
-            <marker date="1537891573530" expanded="false" signature="6815:6826" ph=" { " />
-            <marker date="1537891573530" expanded="false" signature="6854:6860" ph=" }" />
-            <marker date="1537891573530" expanded="true" signature="6927:8773" ph="{...}" />
-            <marker date="1537891573530" expanded="true" signature="8838:9150" ph="{...}" />
-            <marker date="1537891573530" expanded="true" signature="9244:9415" ph="{...}" />
-            <marker date="1537891573530" expanded="true" signature="9496:9663" ph="{...}" />
-            <marker date="1537891573530" expanded="true" signature="9773:9855" ph="{...}" />
-            <marker date="1537891573530" expanded="true" signature="9888:10098" ph="{...}" />
-            <marker date="1537891573530" expanded="true" signature="10130:10211" ph="{...}" />
-            <marker date="1537891573530" expanded="true" signature="10281:10682" ph="{...}" />
-            <marker date="1537891573530" expanded="true" signature="10740:10929" ph="{...}" />
-            <marker date="1537891573530" expanded="true" signature="10960:11202" ph="{...}" />
-            <marker date="1537891573530" expanded="true" signature="11250:11337" ph="{...}" />
-            <marker date="1537891573530" expanded="false" signature="11372:11383" ph=" { " />
-            <marker date="1537891573530" expanded="false" signature="11419:11425" ph=" }" />
-            <marker date="1537891573530" expanded="true" signature="11457:11609" ph="{...}" />
-            <marker date="1537891573530" expanded="true" signature="11645:11803" ph="{...}" />
-            <marker date="1537891573530" expanded="false" signature="11843:11854" ph=" { " />
-            <marker date="1537891573530" expanded="false" signature="11887:11893" ph=" }" />
-            <marker date="1537891573530" expanded="true" signature="11966:12281" ph="{...}" />
-            <marker date="1537891573530" expanded="true" signature="12388:12447" ph="{...}" />
-            <marker date="1537891573530" expanded="true" signature="12508:13069" ph="{...}" />
-            <marker date="1537891573530" expanded="true" signature="13127:14175" ph="{...}" />
-            <marker date="1537891573530" expanded="true" signature="14206:14531" ph="{...}" />
-            <marker date="1537891573530" expanded="true" signature="14561:14699" ph="{...}" />
-            <marker date="1537891573530" expanded="false" signature="14759:14770" ph=" { " />
-            <marker date="1537891573530" expanded="false" signature="14782:14788" ph=" }" />
-            <marker date="1537891573530" expanded="true" signature="14848:15041" ph="{...}" />
-            <marker date="1537891573530" expanded="true" signature="15047:15065" ph="/**...*/" />
-            <marker date="1537891573530" expanded="false" signature="15128:15139" ph=" { " />
-            <marker date="1537891573530" expanded="false" signature="15168:15174" ph=" }" />
-            <marker date="1537891573530" expanded="true" signature="15266:16025" ph="{...}" />
-            <marker date="1537891573530" expanded="true" signature="16079:16086" ph="{}" />
-            <marker date="1537891573530" expanded="true" signature="16143:16210" ph="{...}" />
-            <marker date="1537891573530" expanded="true" signature="16216:16234" ph="/**...*/" />
-            <marker date="1537891573530" expanded="false" signature="16301:16312" ph=" { " />
-            <marker date="1537891573530" expanded="false" signature="16351:16357" ph=" }" />
-            <marker date="1537891573530" expanded="true" signature="16430:16629" ph="{...}" />
-            <marker date="1537891573530" expanded="true" signature="16728:16936" ph="{...}" />
-            <marker date="1537891573530" expanded="true" signature="17125:17382" ph="{...}" />
-            <marker date="1537891573530" expanded="true" signature="17587:17853" ph="{...}" />
-            <marker date="1537891573530" expanded="true" signature="17913:18067" ph="{...}" />
-            <marker date="1537891573530" expanded="true" signature="18146:18291" ph="{...}" />
-            <marker date="1537891573530" expanded="true" signature="18413:19215" ph="{...}" />
-            <marker date="1537891573530" expanded="true" signature="19310:19402" ph="{...}" />
-            <marker date="1537891573530" expanded="true" signature="19523:20085" ph="{...}" />
-            <marker date="1537891573530" expanded="true" signature="20312:20999" ph="{...}" />
-            <marker date="1537891573530" expanded="true" signature="21057:21749" ph="{...}" />
-            <marker date="1537891573530" expanded="true" signature="21849:22426" ph="{...}" />
-            <marker date="1537891573530" expanded="true" signature="22468:22628" ph="{...}" />
-            <marker date="1537891573530" expanded="true" signature="22705:23493" ph="{...}" />
-            <marker date="1537891573530" expanded="true" signature="23566:26399" ph="{...}" />
-            <marker date="1537891573530" expanded="false" signature="23598:23613" ph=" { " />
-            <marker date="1537891573530" expanded="false" signature="23642:23652" ph=" }" />
-            <marker date="1537891573530" expanded="true" signature="23750:23827" ph="{...}" />
-            <marker date="1537891573530" expanded="true" signature="23897:23965" ph="{...}" />
-            <marker date="1537891573530" expanded="true" signature="24019:24130" ph="{...}" />
-            <marker date="1537891573530" expanded="false" signature="24175:24190" ph=" { " />
-            <marker date="1537891573530" expanded="false" signature="24219:24229" ph=" }" />
-            <marker date="1537891573530" expanded="true" signature="24284:24361" ph="{...}" />
-            <marker date="1537891573530" expanded="true" signature="24462:24565" ph="{...}" />
-            <marker date="1537891573530" expanded="true" signature="24692:24804" ph="{...}" />
-            <marker date="1537891573530" expanded="true" signature="25037:25203" ph="{...}" />
-            <marker date="1537891573530" expanded="true" signature="25334:25447" ph="{...}" />
-            <marker date="1537891573530" expanded="true" signature="25539:25657" ph="{...}" />
-            <marker date="1537891573530" expanded="false" signature="25705:25720" ph=" { " />
-            <marker date="1537891573530" expanded="false" signature="25769:25779" ph=" }" />
-            <marker date="1537891573530" expanded="true" signature="25824:25964" ph="{...}" />
-            <marker date="1537891573530" expanded="true" signature="26022:26095" ph="{...}" />
-            <marker date="1537891573530" expanded="false" signature="26157:26172" ph=" { " />
-            <marker date="1537891573530" expanded="false" signature="26218:26228" ph=" }" />
-            <marker date="1537891573530" expanded="true" signature="26265:26393" ph="{...}" />
-            <marker date="1537891573530" expanded="true" signature="26450:26612" ph="{...}" />
-            <marker date="1537891573530" expanded="true" signature="26595:26606" ph="{}" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -2964,134 +2776,76 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-1252">
           <caret line="38" column="13" lean-forward="false" selection-start-line="38" selection-start-column="13" selection-end-line="38" selection-end-column="13" />
-          <folding>
-            <marker date="1537891573601" expanded="false" signature="0:104" ph="/.../" />
-            <marker date="1537891573601" expanded="false" signature="146:1402" ph="..." />
-            <marker date="1537891573601" expanded="true" signature="1665:1672" ph="{}" />
-            <marker date="1537891573601" expanded="true" signature="1739:2210" ph="{...}" />
-            <marker date="1537891573601" expanded="true" signature="2258:2327" ph="{...}" />
-            <marker date="1537891573601" expanded="true" signature="2398:2514" ph="{...}" />
-            <marker date="1537891573601" expanded="false" signature="2572:2583" ph=" { " />
-            <marker date="1537891573601" expanded="false" signature="2631:2637" ph=" }" />
-            <marker date="1537891573601" expanded="true" signature="2702:2766" ph="{...}" />
-            <marker date="1537891573601" expanded="false" signature="2809:2820" ph=" { " />
-            <marker date="1537891573601" expanded="false" signature="2864:2870" ph=" }" />
-            <marker date="1537891573601" expanded="true" signature="2931:2994" ph="{...}" />
-            <marker date="1537891573601" expanded="false" signature="3037:3048" ph=" { " />
-            <marker date="1537891573601" expanded="false" signature="3088:3094" ph=" }" />
-            <marker date="1537891573601" expanded="true" signature="3159:3223" ph="{...}" />
-            <marker date="1537891573601" expanded="true" signature="3288:3352" ph="{...}" />
-            <marker date="1537891573601" expanded="true" signature="3418:3740" ph="{...}" />
-            <marker date="1537891573601" expanded="true" signature="3776:3856" ph="{...}" />
-            <marker date="1537891573601" expanded="true" signature="3887:3957" ph="{...}" />
-            <marker date="1537891573601" expanded="true" signature="3987:4055" ph="{...}" />
-            <marker date="1537891573601" expanded="true" signature="4115:4174" ph="{...}" />
-            <marker date="1537891573601" expanded="true" signature="4250:4558" ph="{...}" />
-            <marker date="1537891573601" expanded="true" signature="4591:4665" ph="{...}" />
-            <marker date="1537891573601" expanded="true" signature="4732:4827" ph="{...}" />
-            <marker date="1537891573601" expanded="true" signature="4891:4965" ph="{...}" />
-            <marker date="1537891573601" expanded="false" signature="5013:5024" ph=" { " />
-            <marker date="1537891573601" expanded="false" signature="5067:5073" ph=" }" />
-            <marker date="1537891573601" expanded="false" signature="5114:5125" ph=" { " />
-            <marker date="1537891573601" expanded="false" signature="5168:5174" ph=" }" />
-            <marker date="1537891573601" expanded="true" signature="5260:5267" ph="{}" />
-            <marker date="1537891573601" expanded="true" signature="5354:5361" ph="{}" />
-            <marker date="1537891573601" expanded="false" signature="5460:5471" ph=" { " />
-            <marker date="1537891573601" expanded="false" signature="5483:5489" ph=" }" />
-            <marker date="1537891573601" expanded="true" signature="5578:5653" ph="{...}" />
-            <marker date="1537891573601" expanded="true" signature="5659:5677" ph="/**...*/" />
-            <marker date="1537891573601" expanded="true" signature="5759:5766" ph="{}" />
-            <marker date="1537891573601" expanded="true" signature="5772:5790" ph="/**...*/" />
-            <marker date="1537891573601" expanded="true" signature="5885:5892" ph="{}" />
-            <marker date="1537891573601" expanded="true" signature="5898:5916" ph="/**...*/" />
-            <marker date="1537891573601" expanded="true" signature="6007:6014" ph="{}" />
-            <marker date="1537891573601" expanded="true" signature="6020:6038" ph="/**...*/" />
-            <marker date="1537891573601" expanded="true" signature="6104:6111" ph="{}" />
-            <marker date="1537891573601" expanded="true" signature="6199:6244" ph="{...}" />
-            <marker date="1537891573601" expanded="true" signature="6333:6340" ph="{}" />
-            <marker date="1537891573601" expanded="true" signature="6383:7129" ph="{...}" />
-            <marker date="1537891573601" expanded="true" signature="7196:7258" ph="{...}" />
-            <marker date="1537891573601" expanded="true" signature="7337:7410" ph="{...}" />
-            <marker date="1537891573601" expanded="true" signature="7474:7528" ph="{...}" />
-            <marker date="1537891573601" expanded="false" signature="7564:7575" ph=" { " />
-            <marker date="1537891573601" expanded="false" signature="7606:7612" ph=" }" />
-            <marker date="1537891573601" expanded="true" signature="7618:7636" ph="/**...*/" />
-            <marker date="1537891573601" expanded="true" signature="7695:7702" ph="{}" />
-            <marker date="1537891573601" expanded="true" signature="7764:7832" ph="{...}" />
-            <marker date="1537891573601" expanded="true" signature="7892:7951" ph="{...}" />
-            <marker date="1537891573601" expanded="false" signature="8008:8019" ph=" { " />
-            <marker date="1537891573601" expanded="false" signature="8056:8062" ph=" }" />
-            <marker date="1537891573601" expanded="true" signature="8120:8230" ph="{...}" />
-            <marker date="1537891573601" expanded="true" signature="8288:8442" ph="{...}" />
-            <marker date="1537891573601" expanded="true" signature="8496:8728" ph="{...}" />
-            <marker date="1537891573601" expanded="true" signature="8766:9039" ph="{...}" />
-            <marker date="1537891573601" expanded="true" signature="9114:9680" ph="{...}" />
-            <marker date="1537891573601" expanded="true" signature="9740:9849" ph="{...}" />
-            <marker date="1537891573601" expanded="true" signature="9885:10099" ph="{...}" />
-            <marker date="1537891573601" expanded="true" signature="10136:10352" ph="{...}" />
-          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/bgot/marccelestini/bgot_mobile/BluetoothServices.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="4016">
+        <state relative-caret-position="0">
           <caret line="282" column="58" lean-forward="false" selection-start-line="282" selection-start-column="58" selection-end-line="282" selection-end-column="58" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#4709#5015#0" expanded="true" />
-            <element signature="e#5014#5015#0" expanded="true" />
-            <element signature="e#5083#5313#0" expanded="true" />
-            <element signature="e#5312#5313#0" expanded="true" />
-            <element signature="e#6484#7330#0" expanded="true" />
-            <element signature="e#7329#7330#0" expanded="true" />
-            <element signature="e#7393#7622#0" expanded="true" />
-            <element signature="e#7621#7622#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/bgot/marccelestini/bgot_mobile/ManualTagActivity.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="124">
-          <caret line="90" column="4" lean-forward="false" selection-start-line="90" selection-start-column="4" selection-end-line="133" selection-end-column="5" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#1627#2370#0" expanded="true" />
-            <element signature="e#1820#2326#0" expanded="true" />
-            <element signature="e#2325#2326#0" expanded="true" />
-            <element signature="e#2369#2370#0" expanded="true" />
-            <element signature="e#2719#2968#0" expanded="true" />
-            <element signature="e#2967#2968#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/bgot/marccelestini/bgot_mobile/AutomatedTagActivity.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="225">
-          <caret line="15" column="4" lean-forward="false" selection-start-line="15" selection-start-column="4" selection-end-line="16" selection-end-column="38" />
+        <state relative-caret-position="227">
+          <caret line="23" column="37" lean-forward="false" selection-start-line="23" selection-start-column="37" selection-end-line="23" selection-end-column="37" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#1069#1740#0" expanded="true" />
-            <element signature="e#1262#1696#0" expanded="true" />
-            <element signature="e#1695#1696#0" expanded="true" />
-            <element signature="e#1739#1740#0" expanded="true" />
-            <element signature="e#1789#2045#0" expanded="true" />
-            <element signature="e#2044#2045#0" expanded="true" />
-            <element signature="e#2094#2343#0" expanded="true" />
-            <element signature="e#2342#2343#0" expanded="true" />
           </folding>
         </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/activity_automated_tag.xml">
+      <provider editor-type-id="text-editor">
+        <state relative-caret-position="83">
+          <caret line="14" column="39" lean-forward="false" selection-start-line="14" selection-start-column="39" selection-end-line="14" selection-end-column="39" />
+          <folding />
+        </state>
+      </provider>
+      <provider selected="true" editor-type-id="android-designer2">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/activity_manual_tag.xml">
+      <provider editor-type-id="text-editor">
+        <state relative-caret-position="1107">
+          <caret line="97" column="54" lean-forward="false" selection-start-line="97" selection-start-column="54" selection-end-line="97" selection-end-column="54" />
+          <folding />
+        </state>
+      </provider>
+      <provider selected="true" editor-type-id="android-designer2">
+        <state />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/bgot/marccelestini/bgot_mobile/RLGLActivity.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="193">
-          <caret line="96" column="46" lean-forward="true" selection-start-line="96" selection-start-column="46" selection-end-line="96" selection-end-column="46" />
+          <caret line="96" column="46" lean-forward="false" selection-start-line="96" selection-start-column="46" selection-end-line="96" selection-end-column="46" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/activity_setting.xml">
+      <provider editor-type-id="text-editor">
+        <state relative-caret-position="180">
+          <caret line="12" column="8" lean-forward="false" selection-start-line="12" selection-start-column="8" selection-end-line="12" selection-end-column="8" />
+          <folding />
+        </state>
+      </provider>
+      <provider selected="true" editor-type-id="android-designer2">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/bgot/marccelestini/bgot_mobile/ManualTagActivity.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="362">
+          <caret line="57" column="11" lean-forward="true" selection-start-line="57" selection-start-column="11" selection-end-line="57" selection-end-column="11" />
           <folding>
-            <element signature="e#1607#1856#0" expanded="true" />
-            <element signature="e#1855#1856#0" expanded="true" />
+            <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>

@@ -20,8 +20,8 @@ public class AutomatedTagActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_automated_tag);
-        autoTagPlayButton = findViewById(R.id.autoTagPlayButton);
-        autoTagQuitButton = findViewById(R.id.autoTagQuitButton);
+        autoTagPlayButton = (Button) findViewById(R.id.autoTagPlayButton);
+        autoTagQuitButton = (Button) findViewById(R.id.autoTagQuitButton);
         autoTagPlayButton.setEnabled(false);
         autoTagQuitButton.setEnabled(false);
 
