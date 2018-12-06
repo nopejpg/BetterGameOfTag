@@ -1,12 +1,14 @@
 package com.bgot.marccelestini.bgot_mobile;
 
 import android.content.Intent;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RadioButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class RLGLActivity extends AppCompatActivity {
@@ -14,7 +16,14 @@ public class RLGLActivity extends AppCompatActivity {
     RadioButton rlglYellowRadio;
     RadioButton rlglGreenRadio;
     Button rlglQuitButton;
-    Button rlglPlayButton;
+
+    TextView rlglPod1Display;
+    TextView rlglPod2Display;
+    TextView rlglPod3Display;
+    TextView rlglPod1Label;
+    TextView rlglPod2Label;
+    TextView rlglPod3Label;
+
     BluetoothServices bluetooth;
     String messageStatus = "";
     int duration = Toast.LENGTH_SHORT;
@@ -24,25 +33,89 @@ public class RLGLActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_rlgl);
 
-
         bluetooth=new BluetoothServices(this);
 
         rlglGreenRadio = findViewById(R.id.rlglGreenRadio);
         rlglRedRadio = findViewById(R.id.rlglRedRadio);
         rlglYellowRadio = findViewById(R.id.rlglYellowRadio);
-        rlglPlayButton = findViewById(R.id.rlglPlayButton);
         rlglQuitButton = findViewById(R.id.rlglQuitButton);
 
+        rlglPod1Display = findViewById(R.id.rlglPod1Display);
+        rlglPod2Display = findViewById(R.id.rlglPod2Display);
+        rlglPod3Display = findViewById(R.id.rlglPod3Display);
+        rlglPod1Label = findViewById(R.id.rlglPod1Label);
+        rlglPod2Label = findViewById(R.id.rlglPod2Label);
+        rlglPod3Label = findViewById(R.id.rlglPod3Label);
+
+        rlglPod1Display.setVisibility(View.INVISIBLE);
+        rlglPod2Display.setVisibility(View.INVISIBLE);
+        rlglPod3Display.setVisibility(View.INVISIBLE);
+        rlglPod1Label.setVisibility(View.INVISIBLE);
+        rlglPod2Label.setVisibility(View.INVISIBLE);
+        rlglPod3Label.setVisibility(View.INVISIBLE);
+
         //initialize to red light on
-        rlglRedRadio.setChecked(true);
+        rlglRedRadio.setChecked(false);
         rlglYellowRadio.setChecked(false);
         rlglGreenRadio.setChecked(false);
 
-        rlglPlayButton.setOnClickListener(new View.OnClickListener() {
+        rlglQuitButton.setEnabled(false);
+        rlglRedRadio.setEnabled(false);
+        rlglYellowRadio.setEnabled(false);
+        rlglGreenRadio.setEnabled(false);
+
+        Toast.makeText(getApplicationContext(),"Connecting to hub...", duration).show();
+
+        bluetooth.setBluetoothServicesListener(new BluetoothServices.BluetoothServicesListener() {
             @Override
-            public void onClick(View v) {
-                messageStatus = bluetooth.sendMessage("RL_GL");
-                processMessageStatus(messageStatus,"RL_GL");
+            public void onCommsReady() {
+                if (bluetooth.commsReady) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Log.d("BLE","Communications ready");
+                            Toast.makeText(getApplicationContext(),"Connected!", duration).show();
+                            rlglQuitButton.setEnabled(true);
+                            rlglRedRadio.setEnabled(true);
+                            rlglYellowRadio.setEnabled(true);
+                            rlglGreenRadio.setEnabled(true);
+
+                            rlglPod1Display.setVisibility(View.VISIBLE);
+                            rlglPod2Display.setVisibility(View.VISIBLE);
+                            rlglPod3Display.setVisibility(View.VISIBLE);
+                            rlglPod1Label.setVisibility(View.VISIBLE);
+                            rlglPod2Label.setVisibility(View.VISIBLE);
+                            rlglPod3Label.setVisibility(View.VISIBLE);
+
+    //                        Toast.makeText(getApplicationContext(),"Starting Automated Tag!", duration).show();
+
+                            final Handler handler = new Handler();
+                            handler.postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    messageStatus = bluetooth.sendMessage("RL_GL");
+                                    processMessageStatus(messageStatus,"RL_GL");
+                                }
+                            }, 1000);
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onSystemHealth(final String status) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        boolean pod1Status = status.substring(0,1).equals("1");
+                        boolean pod2Status = status.substring(1,2).equals("1");
+                        boolean pod3Status = status.substring(2,3).equals("1");
+
+                        setText(pod1Status,rlglPod1Display);
+                        setText(pod2Status,rlglPod2Display);
+                        setText(pod3Status,rlglPod3Display);
+                    }
+                });
             }
         });
 
@@ -128,5 +201,15 @@ public class RLGLActivity extends AppCompatActivity {
 
         Toast.makeText(getApplicationContext(),"Unable to send message after retries, exiting to main menu", duration).show();
         exitToMainMenu();
+    }
+
+    void setText(boolean status, TextView podDisplay) {
+        if (status) {
+            podDisplay.setText("Connected");
+            podDisplay.setTextColor(getResources().getColor(R.color.connected));
+        } else {
+            podDisplay.setText("Not Connected");
+            podDisplay.setTextColor(getResources().getColor(R.color.disconnected));
+        }
     }
 }

@@ -46,6 +46,7 @@ public class BluetoothServices{
 
     public interface BluetoothServicesListener {
         public void onCommsReady();
+        public void onSystemHealth(final String health);
     }
 
     public void setBluetoothServicesListener(BluetoothServicesListener listener) {
@@ -142,31 +143,6 @@ public class BluetoothServices{
         });
     }
 
-//    @Override
-//    public void onRequestPermissionsResult(int requestCode,
-//                                           String permissions[], int[] grantResults) {
-//        switch (requestCode) {
-//            case PERMISSION_REQUEST_COARSE_LOCATION: {
-//                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-//                    System.out.println("coarse location permission granted");
-//                } else {
-//                    final AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-//                    builder.setTitle("Cannot connect without location permission granted");;
-//                    builder.setPositiveButton(android.R.string.ok, null);
-//                    builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
-//
-//                        @Override
-//                        public void onDismiss(DialogInterface dialog) {
-//                        }
-//
-//                    });
-//                    builder.show();
-//                }
-//                return;
-//            }
-//        }
-//    }
-
     // Device scan callback.
     private ScanCallback leScanCallback = new ScanCallback() {
 
@@ -175,7 +151,6 @@ public class BluetoothServices{
             Log.d("BLE Scan", "Name: " +result.getDevice().getName());
             String deviceAddress = result.getDevice().getAddress();
 
-//                if (deviceAddress.equals("20:FA:BB:04:9E:9B")) { // <-- testing
                 if (deviceAddress.equals("20:FA:BB:04:9E:B4")) { // <-- the actual hub
 
                 Log.d("BLE","Hub discovered, connecting...");
@@ -241,6 +216,7 @@ public class BluetoothServices{
                 String status = messageString.substring(5,8);
                 Log.d("SYSTEM", "Received Pod Status: " + status);
                 ((MyApplicationBGOT) activity.getApplication()).setPodStatus(status);
+                if (listener != null) listener.onSystemHealth(status);
             }
 
             if (messageString.contains("ACK")) {
@@ -292,4 +268,5 @@ public class BluetoothServices{
         }
         commsReady = false;
     }
+
 }

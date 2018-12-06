@@ -7,6 +7,71 @@
     tools:context=".RLGLActivity">
 
     <TextView
+        android:id="@+id/rlglPod3Label"
+        android:layout_width="253dp"
+        android:layout_height="51dp"
+        android:layout_marginTop="44dp"
+        android:text="Pod 3 Status"
+        android:textColor="@android:color/black"
+        android:textSize="36sp"
+        app:layout_constraintStart_toStartOf="@+id/rlglPod2Label"
+        app:layout_constraintTop_toBottomOf="@+id/rlglPod2Label" />
+
+    <TextView
+        android:id="@+id/rlglPod2Label"
+        android:layout_width="251dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="44dp"
+        android:text="Pod 2 Status"
+        android:textColor="@android:color/black"
+        android:textSize="36sp"
+        app:layout_constraintStart_toStartOf="@+id/rlglPod1Label"
+        app:layout_constraintTop_toBottomOf="@+id/rlglPod1Label" />
+
+    <TextView
+        android:id="@+id/rlglPod1Label"
+        android:layout_width="247dp"
+        android:layout_height="55dp"
+        android:layout_marginStart="48dp"
+        android:layout_marginTop="60dp"
+        android:text="Pod 1 Status"
+        android:textColor="@android:color/black"
+        android:textSize="36sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/rlglQuitButton" />
+
+    <TextView
+        android:id="@+id/rlglPod3Display"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Select Color..."
+        android:textColor="@android:color/holo_orange_dark"
+        android:textSize="30sp"
+        app:layout_constraintEnd_toEndOf="@+id/rlglPod2Display"
+        app:layout_constraintTop_toTopOf="@+id/rlglPod3Label" />
+
+    <TextView
+        android:id="@+id/rlglPod2Display"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Select Color..."
+        android:textColor="@android:color/holo_orange_dark"
+        android:textSize="30sp"
+        app:layout_constraintEnd_toEndOf="@+id/rlglPod1Display"
+        app:layout_constraintTop_toTopOf="@+id/rlglPod2Label" />
+
+    <TextView
+        android:id="@+id/rlglPod1Display"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="112dp"
+        android:text="Select Color..."
+        android:textColor="@android:color/holo_orange_dark"
+        android:textSize="30sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/rlglPod1Label" />
+
+    <TextView
         android:id="@+id/rlglHeader"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -24,28 +89,15 @@
         android:id="@+id/rlglQuitButton"
         android:layout_width="137dp"
         android:layout_height="90dp"
-        android:layout_marginBottom="52dp"
-        android:layout_marginEnd="124dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="44dp"
         android:text="Quit"
         android:textSize="30sp"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/rlglGreenRadio" />
-
-    <Button
-        android:id="@+id/rlglPlayButton"
-        android:layout_width="137dp"
-        android:layout_height="90dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginStart="124dp"
-        android:layout_marginTop="8dp"
-        android:text="Play"
-        android:textSize="30sp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHorizontal_bias="0.501"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/rlglGreenRadio"
-        app:layout_constraintVertical_bias="0.386" />
+        app:layout_constraintTop_toBottomOf="@+id/rlglGreenRadio" />
 
     <RadioButton
         android:id="@+id/rlglRedRadio"
@@ -53,11 +105,10 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="160dp"
+        android:layout_marginTop="48dp"
         android:text="Red"
         android:textSize="30sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.499"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/rlglHeader" />
 

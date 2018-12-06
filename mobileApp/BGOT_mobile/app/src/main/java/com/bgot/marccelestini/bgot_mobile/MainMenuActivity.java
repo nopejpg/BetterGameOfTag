@@ -13,8 +13,8 @@ public class MainMenuActivity extends AppCompatActivity {
     Button autoTagButton;
     Button manualTagButton;
     Button redLightGreenLightButton;
-    ImageButton settingsButton;
-    BluetoothServices bluetooth;
+//    ImageButton settingsButton;
+//    BluetoothServices bluetooth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,7 +24,7 @@ public class MainMenuActivity extends AppCompatActivity {
         autoTagButton = (Button) findViewById(R.id.autoTagButton);
         manualTagButton = (Button) findViewById(R.id.manualTagButton);
         redLightGreenLightButton = (Button) findViewById(R.id.redLightGreenLightButton);
-        settingsButton = (ImageButton) findViewById(R.id.settingsButton);
+//        settingsButton = (ImageButton) findViewById(R.id.settingsButton);
 
         autoTagButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -47,35 +47,35 @@ public class MainMenuActivity extends AppCompatActivity {
             }
         });
 
-        settingsButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                goToSettings();
-            }
-        });
+//        settingsButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                goToSettings();
+//            }
+//        });
 
-        bluetooth=new BluetoothServices(this);
+//        bluetooth=new BluetoothServices(this);
     }
 
     public void runAutoTag() {
-        bluetooth.disconnectGattServer();
+//        bluetooth.disconnectGattServer();
         Intent intent = new Intent(this, AutomatedTagActivity.class);
         startActivity(intent);
     }
     public void runManualTag() {
-        bluetooth.disconnectGattServer();
+//        bluetooth.disconnectGattServer();
         Intent intent = new Intent(this, ManualTagActivity.class);
         startActivity(intent);
     }
     public void runRLGL() {
-        bluetooth.disconnectGattServer();
+//        bluetooth.disconnectGattServer();
         Intent intent = new Intent(this, RLGLActivity.class);
         startActivity(intent);
     }
-    public void goToSettings() {
-        bluetooth.disconnectGattServer();
-        Intent intent = new Intent(this, SettingActivity.class);
-        startActivity(intent);
-    }
+//    public void goToSettings() {
+////        bluetooth.disconnectGattServer();
+//        Intent intent = new Intent(this, SettingActivity.class);
+//        startActivity(intent);
+//    }
 
 }

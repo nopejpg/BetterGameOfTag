@@ -7,12 +7,77 @@
     tools:context=".ManualTagActivity">
 
     <TextView
+        android:id="@+id/manTagPod1Label"
+        android:layout_width="149dp"
+        android:layout_height="55dp"
+        android:layout_marginStart="116dp"
+        android:layout_marginTop="76dp"
+        android:text="Pod 1 Status"
+        android:textColor="@android:color/black"
+        android:textSize="24sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/manualTagQuitButton" />
+
+    <TextView
+        android:id="@+id/manTagPod3Display"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Update Pods..."
+        android:textColor="@android:color/holo_orange_dark"
+        android:textSize="30sp"
+        app:layout_constraintEnd_toEndOf="@+id/manTagPod2Display"
+        app:layout_constraintTop_toTopOf="@+id/manTagPod3Label" />
+
+    <TextView
+        android:id="@+id/manTagPod1Display"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="120dp"
+        android:text="Update Pods..."
+        android:textColor="@android:color/holo_orange_dark"
+        android:textSize="30sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/manTagPod1Label" />
+
+    <TextView
+        android:id="@+id/manTagPod2Display"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Update Pods..."
+        android:textColor="@android:color/holo_orange_dark"
+        android:textSize="30sp"
+        app:layout_constraintEnd_toEndOf="@+id/manTagPod1Display"
+        app:layout_constraintTop_toTopOf="@+id/manTagPod2Label" />
+
+    <TextView
+        android:id="@+id/manTagPod2Label"
+        android:layout_width="154dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="24dp"
+        android:text="Pod 2 Status"
+        android:textColor="@android:color/black"
+        android:textSize="24sp"
+        app:layout_constraintStart_toStartOf="@+id/manTagPod1Label"
+        app:layout_constraintTop_toBottomOf="@+id/manTagPod1Label" />
+
+    <TextView
+        android:id="@+id/manTagPod3Label"
+        android:layout_width="158dp"
+        android:layout_height="51dp"
+        android:layout_marginTop="24dp"
+        android:text="Pod 3 Status"
+        android:textColor="@android:color/black"
+        android:textSize="24sp"
+        app:layout_constraintStart_toStartOf="@+id/manTagPod2Label"
+        app:layout_constraintTop_toBottomOf="@+id/manTagPod2Label" />
+
+    <TextView
         android:id="@+id/manualTagHeader"
         android:layout_width="wrap_content"
         android:layout_height="48dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="132dp"
+        android:layout_marginTop="48dp"
         android:text="Manual Tag"
         android:textAllCaps="true"
         android:textColor="@android:color/black"
@@ -23,51 +88,41 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
-        android:id="@+id/manualTagPlayButton"
-        android:layout_width="157dp"
-        android:layout_height="98dp"
-        android:layout_marginBottom="56dp"
-        android:layout_marginStart="112dp"
-        android:text="Play"
-        android:textSize="30sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <Button
         android:id="@+id/manualTagQuitButton"
         android:layout_width="157dp"
         android:layout_height="98dp"
-        android:layout_marginBottom="56dp"
-        android:layout_marginEnd="112dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
         android:text="Quit"
         android:textSize="30sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.501"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/manualTagUpdateButton" />
 
     <TextView
         android:id="@+id/manualTagPod3Label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="128dp"
-        android:layout_marginTop="68dp"
+        android:layout_marginTop="32dp"
         android:text="Pod 3"
         android:textAllCaps="false"
         android:textColor="@android:color/black"
         android:textSize="30sp"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/manualTagPod2Label"
         app:layout_constraintTop_toBottomOf="@+id/manualTagPod2Label" />
 
     <TextView
         android:id="@+id/manualTagPod2Label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="128dp"
-        android:layout_marginTop="60dp"
+        android:layout_marginTop="32dp"
         android:text="Pod 2"
         android:textAllCaps="false"
         android:textColor="@android:color/black"
         android:textSize="30sp"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/manualTagPod1Label"
         app:layout_constraintTop_toBottomOf="@+id/manualTagPod1Label" />
 
     <TextView
@@ -87,8 +142,6 @@
         android:id="@+id/manualTagPod3Switch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="132dp"
-        android:layout_marginTop="60dp"
         android:showText="true"
         android:textOff="Unsafe"
         android:textOn="Safe"
@@ -96,15 +149,13 @@
         android:textStyle="bold"
         android:thumbTint="@android:color/holo_blue_dark"
         android:trackTint="@android:color/transparent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/manualTagPod2Switch" />
+        app:layout_constraintEnd_toEndOf="@+id/manualTagPod2Switch"
+        app:layout_constraintTop_toTopOf="@+id/manualTagPod3Label" />
 
     <Switch
         android:id="@+id/manualTagPod2Switch"
         android:layout_width="wrap_content"
-        android:layout_height="41dp"
-        android:layout_marginEnd="132dp"
-        android:layout_marginTop="52dp"
+        android:layout_height="38dp"
         android:showText="true"
         android:textOff="Unsafe"
         android:textOn="Safe"
@@ -112,15 +163,14 @@
         android:textStyle="bold"
         android:thumbTint="@android:color/holo_blue_dark"
         android:trackTint="@android:color/transparent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/manualTagPod1Switch" />
+        app:layout_constraintEnd_toEndOf="@+id/manualTagPod1Switch"
+        app:layout_constraintTop_toTopOf="@+id/manualTagPod2Label" />
 
     <Switch
         android:id="@+id/manualTagPod1Switch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="132dp"
-        android:layout_marginTop="100dp"
         android:showText="true"
         android:textOff="Unsafe"
         android:textOn="Safe"
@@ -129,7 +179,7 @@
         android:thumbTint="@android:color/holo_blue_dark"
         android:trackTint="@android:color/transparent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/manualTagHeader" />
+        app:layout_constraintTop_toTopOf="@+id/manualTagPod1Label" />
 
     <Button
         android:id="@+id/manualTagUpdateButton"
@@ -137,10 +187,11 @@
         android:layout_height="67dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="52dp"
+        android:layout_marginTop="36dp"
         android:text="Update Pods"
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.501"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/manualTagPod3Label" />
 

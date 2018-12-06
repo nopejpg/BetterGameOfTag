@@ -7,6 +7,71 @@
     tools:context=".AutomatedTagActivity">
 
     <TextView
+        android:id="@+id/autoTagPod3Display"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Loading..."
+        android:textColor="@android:color/holo_orange_dark"
+        android:textSize="30sp"
+        app:layout_constraintEnd_toEndOf="@+id/autoTagPod2Display"
+        app:layout_constraintTop_toTopOf="@+id/autoTagPod3Label" />
+
+    <TextView
+        android:id="@+id/autoTagPod3Label"
+        android:layout_width="223dp"
+        android:layout_height="51dp"
+        android:layout_marginTop="60dp"
+        android:text="Pod 3 Status"
+        android:textColor="@android:color/black"
+        android:textSize="36sp"
+        app:layout_constraintStart_toStartOf="@+id/autoTagPod2Label"
+        app:layout_constraintTop_toBottomOf="@+id/autoTagPod2Label" />
+
+    <TextView
+        android:id="@+id/autoTagPod2Label"
+        android:layout_width="207dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="64dp"
+        android:text="Pod 2 Status"
+        android:textColor="@android:color/black"
+        android:textSize="36sp"
+        app:layout_constraintStart_toStartOf="@+id/autoTagPod1Label"
+        app:layout_constraintTop_toBottomOf="@+id/autoTagPod1Label" />
+
+    <TextView
+        android:id="@+id/autoTagPod2Display"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Loading..."
+        android:textColor="@android:color/holo_orange_dark"
+        android:textSize="30sp"
+        app:layout_constraintEnd_toEndOf="@+id/autoTagPod1Display"
+        app:layout_constraintTop_toTopOf="@+id/autoTagPod2Label" />
+
+    <TextView
+        android:id="@+id/autoTagPod1Display"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="136dp"
+        android:text="Loading..."
+        android:textColor="@android:color/holo_orange_dark"
+        android:textSize="30sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/autoTagPod1Label" />
+
+    <TextView
+        android:id="@+id/autoTagPod1Label"
+        android:layout_width="217dp"
+        android:layout_height="55dp"
+        android:layout_marginStart="76dp"
+        android:layout_marginTop="104dp"
+        android:text="Pod 1 Status"
+        android:textColor="@android:color/black"
+        android:textSize="36sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/autoTagQuitButton" />
+
+    <TextView
         android:id="@+id/autoTagHeader"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -23,32 +88,19 @@
 
     <Button
         android:id="@+id/autoTagQuitButton"
-        android:layout_width="215dp"
+        android:layout_width="217dp"
         android:layout_height="104dp"
         android:layout_marginBottom="8dp"
-        android:layout_marginEnd="64dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:text="Quit"
         android:textAllCaps="false"
         android:textSize="30sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/autoTagHeader"
-        app:layout_constraintVertical_bias="0.26999998" />
-
-    <Button
-        android:id="@+id/autoTagPlayButton"
-        android:layout_width="215dp"
-        android:layout_height="104dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginStart="76dp"
-        android:layout_marginTop="8dp"
-        android:text="Play"
-        android:textAllCaps="false"
-        android:textSize="30sp"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/autoTagHeader"
-        app:layout_constraintVertical_bias="0.276" />
+        app:layout_constraintVertical_bias="0.193" />
 
 </android.support.constraint.ConstraintLayout>
