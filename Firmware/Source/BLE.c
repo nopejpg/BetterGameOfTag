@@ -78,7 +78,7 @@ typedef struct
 podInfo podInfoList = {.Pod1_Address = "20FABB049EA5",.Pod2_Address = "20FABB049E77", .Pod3_Address = "20FABB049E7B",
 											.Pod1_Connected = false,.Pod2_Connected = false,.Pod3_Connected = false,
 											.Pod1_Current_State = INIT, .Pod2_Current_State = INIT, .Pod3_Current_State = INIT,
-											.Pod1_Online = false, .Pod2_Online = false, .Pod3_Online = false};
+											.Pod1_Online = true, .Pod2_Online = true, .Pod3_Online = true};
 
 static char scannedAddress[12];
 static char connectedDeviceAddress[12];
