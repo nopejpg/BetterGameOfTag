@@ -78,7 +78,7 @@ typedef struct
 podInfo podInfoList = {.Pod1_Address = "20FABB049EA5",.Pod2_Address = "20FABB049E77", .Pod3_Address = "20FABB049E7B",
 											.Pod1_Connected = false,.Pod2_Connected = false,.Pod3_Connected = false,
 											.Pod1_Current_State = INIT, .Pod2_Current_State = INIT, .Pod3_Current_State = INIT,
-											.Pod1_Online = true, .Pod2_Online = true, .Pod3_Online = true};
+											.Pod1_Online = false, .Pod2_Online = false, .Pod3_Online = false};
 
 static char scannedAddress[12];
 static char connectedDeviceAddress[12];
@@ -123,9 +123,9 @@ void BLE_init(void)
 	#ifdef IS_HUB_DEVICE
 	UART1_init(9600,&BLE_handleUARTCB_forPods);
 	osDelay(3000); //give system a couple of seconds before sending command to pods.
-	BLE_initBLE_forPods();
+	//BLE_initBLE_forPods(); //taking this out to increase reset speed. BLE will remember its role, so this is not really needed.
 	#endif //IS_HUB_DEVICE
-	BLE_initBLE_forPhone();
+	//BLE_initBLE_forPhone(); //taking this out to increase reset speed. BLE will remember its role, so this is not really needed.
 }
 
 void Thread_BLE(void *arg)
@@ -694,6 +694,7 @@ static void BLE_changePodStates(void)
 		else //indicate that pod is offline
 		{
 			podInfoList.Pod1_Online = false;
+			BLE_issueResetCommand(PODS_BLE); //Trying to connect to a pod that is offline puts module into bad state. If all retries fail, then reset module and move on.
 		}
 	}
 	if(sBLE.podConnected)
@@ -767,6 +768,7 @@ static void BLE_changePodStates(void)
 		else //indicate that pod is offline
 		{
 			podInfoList.Pod3_Online = false;
+			BLE_issueResetCommand(PODS_BLE); //Trying to connect to a pod that is offline puts module into bad state. If all retries fail, then reset module and move on.
 		}
 		if(sBLE.podConnected)
 			BLE_disconnectFromDevice();
@@ -801,8 +803,8 @@ static void BLE_initBLE_forPods(void)
 	}while(result != SUCCESS);
 	do
 	{
-		result = BLE_stdCommand((uint8_t *)"set scnp=000F4240 00002BF2", PODS_BLE); //set scan interval to 1000000us (0x000F4240) to prevent UART from being overwhelmed
-		//result = BLE_stdCommand((uint8_t *)"set scnp=0003D090 00002BF2", UART_num); //set scan interval to 250000us (0x0003D090) to prevent UART from being overwhelmed
+		//result = BLE_stdCommand((uint8_t *)"set scnp=000F4240 00002BF2", PODS_BLE); //set scan interval to 1000000us (0x000F4240) to prevent UART from being overwhelmed
+		result = BLE_stdCommand((uint8_t *)"set scnp=0003D090 00002BF2", PODS_BLE); //set scan interval to 250000us (0x0003D090) to prevent UART from being overwhelmed
 	}while(result != SUCCESS);
 	do
 	{
